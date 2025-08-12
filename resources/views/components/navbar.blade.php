@@ -1,4 +1,4 @@
-<nav class="bg-gray-800 text-white p-4">
+<nav class="bg-gradient-to-r from-blue-600 to-blue-500 text-white py-4">
     <div class="container mx-auto flex justify-between items-center">
         <a href="{{ route('home') }}" class="text-xl font-bold">Blue Star Memory</a>
         <div class="space-x-4">

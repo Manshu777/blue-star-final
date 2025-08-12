@@ -1,4 +1,4 @@
-<section id="how-it-works" class="py-20 mt-5  bg-white">
+<section id="how-it-works" class="py-10 mt-5 lg:mt-[150px] bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 class="text-3xl md:text-4xl font-bold text-gray-900 text-center lg:text-left mb-16">
             How It Works

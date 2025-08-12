@@ -38,7 +38,7 @@
             </div>
         </div>
 
-        <section class="py-8 lg:py-16 w-full ">
+        <section class="py-8 lg:py-16 w-full absolute top-[283px] left-0 ">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     <div class="text-center group hover:transform hover:scale-105 transition-all duration-300">
