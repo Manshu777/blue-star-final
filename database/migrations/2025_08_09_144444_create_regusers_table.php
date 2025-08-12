@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('regusers', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('username')->unique();
             $table->string('email')->unique();
+            $table->string('phone');
             $table->string('password');
             $table->string('selfie_url')->nullable();
             $table->timestamps();
