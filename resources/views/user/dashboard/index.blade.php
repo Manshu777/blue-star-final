@@ -1,72 +1,62 @@
-{{-- resources/views/user/dashboard/index.blade.php --}}
 @extends('layouts.app')
 
-@section('title', 'Dashboard')
+@section('title', 'Dashboard - Blue Star Memory')
 
 @section('content')
-    <div class="max-w-7xl mx-auto px-4 py-8">
-        {{-- Page Heading --}}
-        <div class="flex items-center justify-between mb-8">
-            <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
-                Welcome back, {{ Auth::user()->name ?? 'User' }} 👋
-            </h1>
-            <a href="{{ route('photos.search') }}"
-                class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
-                Upload Photos
-            </a>
+<div class="min-h-screen flex items-center justify-center bg-gray-100">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl">
+        <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Welcome to Your Dashboard</h2>
+
+        <!-- Search Form -->
+        <form method="GET"  class="mb-6">
+            <div class="flex items-center space-x-2">
+                <input type="text" name="query" id="query" placeholder="Search photos..."
+                       class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                       maxlength="255">
+                <button type="submit"
+                        class="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Search
+                </button>
+            </div>
+        </form>
+
+        <!-- Facial Search Form -->
+        <form method="POST" enctype="multipart/form-data" class="mb-6">
+            @csrf
+            <div class="flex items-center space-x-2">
+                <input type="file" name="image" id="image" accept="image/*"
+                       class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                <button type="submit"
+                        class="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Facial Search
+                </button>
+            </div>
+        </form>
+
+        <!-- Display validation errors -->
+        @if ($errors->any())
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded">
+                <ul class="list-disc list-inside">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <!-- Placeholder for Photos -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <!-- Example placeholder for photos -->
+            <div class="bg-gray-200 h-48 rounded-md flex items-center justify-center">
+                <span class="text-gray-500">Photo Placeholder</span>
+            </div>
+            <!-- Add more photo placeholders or dynamic content here -->
         </div>
 
-        {{-- Stats Section --}}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <h2 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Photos</h2>
-                <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">1,248</p>
-            </div>
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <h2 class="text-sm font-medium text-gray-500 dark:text-gray-400">Albums</h2>
-                <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">32</p>
-            </div>
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <h2 class="text-sm font-medium text-gray-500 dark:text-gray-400">Orders</h2>
-                <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">58</p>
-            </div>
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <h2 class="text-sm font-medium text-gray-500 dark:text-gray-400">Revenue</h2>
-                <p class="mt-2 text-3xl font-bold text-green-500">₹45,300</p>
-            </div>
-        </div>
-
-        {{-- Recent Activity --}}
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Recent Activity</h2>
-                <a href="{{ route('photos.search') }}" class="text-blue-600 hover:underline text-sm">View All</a>
-            </div>
-            <ul class="divide-y divide-gray-200 dark:divide-gray-700">
-                <li class="px-6 py-4 flex items-center justify-between">
-                    <div class="flex items-center">
-                        <img src="/assets/sample-photo.jpg" class="w-12 h-12 rounded object-cover mr-4" alt="Photo">
-                        <div>
-                            <p class="text-gray-800 dark:text-gray-100">Sunset over the hills</p>
-                            <p class="text-sm text-gray-500">Uploaded 2 hours ago</p>
-                        </div>
-                    </div>
-                    <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Published</span>
-                </li>
-                <li class="px-6 py-4 flex items-center justify-between">
-                    <div class="flex items-center">
-                        <img src="/assets/sample-photo2.jpg" class="w-12 h-12 rounded object-cover mr-4" alt="Photo">
-                        <div>
-                            <p class="text-gray-800 dark:text-gray-100">Beach Day</p>
-                            <p class="text-sm text-gray-500">Edited yesterday</p>
-                        </div>
-                    </div>
-                    <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full">Pending</span>
-                </li>
-            </ul>
-        </div>
+        <!-- Link to Preview (Example) -->
+        <p class="mt-4 text-center text-sm text-gray-600">
+            <a  class="text-indigo-600 hover:text-indigo-800">View Sample Photo</a>
+        </p>
     </div>
+</div>
 @endsection

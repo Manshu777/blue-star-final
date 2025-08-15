@@ -14,6 +14,65 @@ class ProfileController extends Controller
     /**
      * Display the user's profile form.
      */
+
+     public function index()
+    {
+        // Placeholder for dashboard data (e.g., recent photos or user info)
+        return view('user.dashboard.index');
+    }
+
+
+     /**
+     * Handle general photo search.
+     */
+    public function search(Request $request)
+    {
+        // Validate search query
+        $request->validate([
+            'query' => 'nullable|string|max:255',
+        ]);
+
+        // Placeholder for search logic
+        $query = $request->input('query');
+        // Implement search logic here (e.g., query database for photos)
+        $photos = []; // Replace with actual search results
+
+        return view('photos.search', compact('photos', 'query'));
+    }
+
+    /**
+     * Handle facial recognition-based photo search.
+     */
+    public function facialSearch(Request $request)
+    {
+        // Validate uploaded image for facial search
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        // Placeholder for facial recognition logic
+        // Process the uploaded image and find matching photos
+        $photos = []; // Replace with actual facial search results
+
+        return view('photos.search', compact('photos'));
+    }
+
+    /**
+     * Display a photo preview.
+     */
+    public function preview($id)
+    {
+        // Placeholder for fetching photo by ID
+        $photo = null; // Replace with actual photo retrieval logic
+
+        if (!$photo) {
+            abort(404, 'Photo not found');
+        }
+
+        return view('photos.preview', compact('photo'));
+    }
+
+
     public function edit(Request $request): View
     {
         return view('profile.edit', [
