@@ -12,7 +12,7 @@ use Aws\S3\S3Client;
 use Aws\Sdk;
 
 
-
+use Illuminate\Support\Str;
 class UploadController extends Controller
 {
 
@@ -56,9 +56,9 @@ class UploadController extends Controller
      */
 
 
-    public function store(Request $request)
-    {
-        try {
+   public function store(Request $request)
+{
+    try {
             // Validate the request
             $validated = $request->validate([
                 'title' => 'required|string|max:255',
@@ -73,21 +73,78 @@ class UploadController extends Controller
             // Retrieve the file from the request
             $file = $request->file('file');
 
-            // Custom path for storing the file on S3
-            $path = "blue-star-media/" . date('Y') . "/{$validated['price']}/{$validated['license_type']}/" . time() . '_' . $file->getClientOriginalName();
+            // Ensure the file is valid
+            if (!$file->isValid()) {
+                \Log::error('Invalid file uploaded: ' . $file->getErrorMessage());
+                return response()->json(['success' => false, 'message' => 'Invalid file uploaded.'], 422);
+            }
 
-            // Upload file to S3 using Laravel's Storage facade
-            Storage::disk('s3')->put($path, fopen($file->getRealPath(), 'r'), 'public');
+            // Generate a unique filename
+            $fileExtension = $file->getClientOriginalExtension();
+            $fileName = Str::random(40) . '.' . $fileExtension;
+
+            // Use the same directory as the upload method
+            $directory = 'uploads'; // Or 'bluestatlaravel/uploads' if you want the bucket name in the path
+            $path = "$directory/$fileName";
+
+            // Log file details
+            \Log::info('Attempting S3 upload', [
+                'original_name' => $file->getClientOriginalName(),
+                'size' => $file->getSize(),
+                'mime' => $file->getMimeType(),
+                'target_path' => $path,
+                'bucket' => config('filesystems.disks.s3.bucket'),
+                'region' => config('filesystems.disks.s3.region'),
+            ]);
+
+            // Verify S3 disk configuration
+            $s3Config = config('filesystems.disks.s3');
+            \Log::info('S3 Configuration', [
+                'bucket' => $s3Config['bucket'],
+                'region' => $s3Config['region'],
+                'key' => $s3Config['key'] ? '****' : 'missing',
+                'secret' => $s3Config['secret'] ? '****' : 'missing',
+            ]);
+
+            // Upload file to S3 (without specifying ACL, matching the upload method)
+            try {
+                $uploadedPath = Storage::disk('s3')->putFileAs(
+                    $directory,
+                    $file,
+                    $fileName
+                );
+            } catch (\Exception $e) {
+                \Log::error('S3 putFileAs failed', [
+                    'message' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+                throw new \Exception('S3 upload failed: ' . $e->getMessage());
+            }
+
+            // Verify the path is not empty
+            if (empty($uploadedPath)) {
+                \Log::error('S3 upload failed: Empty path returned');
+                return response()->json(['success' => false, 'message' => 'Failed to generate S3 file path.'], 500);
+            }
+
+            // Verify file exists in S3
+            $exists = Storage::disk('s3')->exists($uploadedPath);
+            \Log::info('S3 file existence check', ['path' => $uploadedPath, 'exists' => $exists]);
+            if (!$exists) {
+                \Log::error('S3 upload failed: File does not exist in bucket');
+                return response()->json(['success' => false, 'message' => 'File was not uploaded to S3.'], 500);
+            }
+
+            // Get the URL of the uploaded file
+            $url = Storage::disk('s3')->url($uploadedPath);
 
             // Store metadata (Exif for image files)
             $metadata = [];
-            if (in_array($file->getMimeType(), ['image/jpeg', 'image/png'])) {
-                if (function_exists('\exif_read_data')) {
-                    $exif = @\exif_read_data($file->getRealPath());
-                    if ($exif) {
-                        $metadata['date'] = $exif['DateTimeOriginal'] ?? null;
-                        $metadata['location'] = $exif['GPSLatitude'] ?? null;
-                    }
+            if (in_array($file->getMimeType(), ['image/jpeg', 'image/png']) && function_exists('exif_read_data')) {
+                $exif = @exif_read_data($file->getRealPath());
+                if ($exif) {
+                    $metadata['date'] = $exif['DateTimeOriginal'] ?? null;
+                    $metadata['location'] = $exif['GPSLatitude'] ?? null;
                 }
             }
 
@@ -95,11 +152,12 @@ class UploadController extends Controller
             $autoTags = 'face_detected,location_based';
             $tags = $validated['tags'] ? $validated['tags'] . ',' . $autoTags : $autoTags;
 
+
             // Create the photo record in the database
             $photo = Photo::create([
                 'title' => $validated['title'],
                 'description' => $validated['description'],
-                'image_path' => $path,
+                'image_path' => $uploadedPath,
                 'price' => $validated['price'],
                 'is_featured' => $validated['is_featured'] ?? false,
                 'license_type' => $validated['license_type'],
@@ -107,38 +165,26 @@ class UploadController extends Controller
                 'metadata' => json_encode($metadata),
             ]);
 
-            // Get the URL of the uploaded file on S3
-            $url = Storage::disk('s3')->url($path);
-
-            // Facial recognition with Rekognition (if it's an image)
-            if (in_array($file->getMimeType(), ['image/jpeg', 'image/png'])) {
-                $result = $this->rekognition->detectFaces([
-                    'Image' => [
-                        'S3Object' => [
-                            'Bucket' => env('AWS_BUCKET'),
-                            'Name' => $path,
-                        ],
-                    ],
-                ]);
-
-                // You can process the result here if needed
-                // Example: Check if faces are detected
-                $facesDetected = count($result['FaceDetails']) > 0;
-                if ($facesDetected) {
-                    // Do something, like adding tags for face detection
-                    $tags .= ',faces_detected';
-                }
-            }
+            \Log::info('S3 upload successful', ['path' => $uploadedPath, 'url' => $url]);
 
             return response()->json(['success' => true, 'photo' => $photo, 'url' => $url], 201);
 
         } catch (ValidationException $e) {
-            return response()->json(['errors' => $e->errors()], 422);
+            \Log::error('Validation failed: ' . json_encode($e->errors()));
+            return response()->json(['success' => false, 'errors' => $e->errors()], 422);
+        } catch (S3Exception $e) {
+            \Log::error('S3 AWS Exception: ' . $e->getMessage(), [
+                'aws_error' => $e->getAwsErrorCode(),
+                'aws_message' => $e->getAwsErrorMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json(['success' => false, 'message' => 'S3 upload failed: ' . $e->getMessage()], 500);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred during upload: ' . $e->getMessage()], 500);
+            \Log::error('S3 Upload Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return response()->json(['success' => false, 'message' => 'File upload failed: ' . $e->getMessage()], 500);
         }
-    }
-
+    
+}
 
 
     /**
