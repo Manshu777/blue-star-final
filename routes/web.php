@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\S3FileUploadController;
-use App\Http\Controllers\PhotoController;
+use App\Http\Controllers\UploadController;
 
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -14,18 +14,12 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 
 
-Route::middleware('auth')->group(function () {
-    Route::get('/photos', [PhotoController::class, 'index'])->name('photos.index');
-    Route::post('/upload', [PhotoController::class, 'upload'])->name('upload');
-    Route::post('/edit/sharpen', [PhotoController::class, 'sharpen'])->name('edit.sharpen');
-    Route::post('/edit/color-correct', [PhotoController::class, 'colorCorrect'])->name('edit.colorCorrect');
-    Route::post('/edit/remove-background', [PhotoController::class, 'removeBackground'])->name('edit.removeBackground');
-    Route::post('/save', [PhotoController::class, 'save'])->name('save');
-    Route::post('/share', [PhotoController::class, 'share'])->name('share');
-    Route::patch('/photos/{photo}/tags', [PhotoController::class, 'updateTags'])->name('update.tags');
-    Route::delete('/photos/{photo}', [PhotoController::class, 'delete'])->name('delete');
-    Route::post('/toggle-merch', [PhotoController::class, 'toggleMerch'])->name('toggle.merch');
-});
+Route::post('photos', [UploadController::class, 'store'])->name('photos.store');
+Route::get('photos', [UploadController::class, 'index'])->name('photos.index');
+Route::get('photos/{photo}', [UploadController::class, 'show'])->name('photos.show');
+Route::post('photos/{photo}', [UploadController::class, 'update'])->name('photos.update');
+Route::delete('photos/{photo}', [UploadController::class, 'destroy'])->name('photos.destroy');
+
 
 Route::view('/login', 'auth.login')->name('login');
 
