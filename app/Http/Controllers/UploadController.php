@@ -56,9 +56,9 @@ class UploadController extends Controller
      */
 
 
-   public function store(Request $request)
-{
-    try {
+    public function store(Request $request)
+    {
+        try {
             // Validate the request
             $validated = $request->validate([
                 'title' => 'required|string|max:255',
@@ -67,7 +67,7 @@ class UploadController extends Controller
                 'license_type' => 'required|string|in:commercial,personal',
                 'is_featured' => 'nullable|boolean',
                 'tags' => 'nullable|string|max:500',
-                'file' => 'required|file|mimes:jpg,jpeg,png,mp4,mov|max:20480',
+                'file' => 'required|file|mimes:jpg,jpeg,png,mp4,mov|max:10240',
             ]);
 
             // Retrieve the file from the request
@@ -83,11 +83,11 @@ class UploadController extends Controller
             $fileExtension = $file->getClientOriginalExtension();
             $fileName = Str::random(40) . '.' . $fileExtension;
 
-            // Use the same directory as the upload method
-            $directory = 'uploads'; // Or 'bluestatlaravel/uploads' if you want the bucket name in the path
-            $path = "$directory/$fileName";
+            
+            $directory = 'uploads';
+            $path = "uploads/$fileName";
 
-            // Log file details
+            
             \Log::info('Attempting S3 upload', [
                 'original_name' => $file->getClientOriginalName(),
                 'size' => $file->getSize(),
@@ -106,7 +106,6 @@ class UploadController extends Controller
                 'secret' => $s3Config['secret'] ? '****' : 'missing',
             ]);
 
-            // Upload file to S3 (without specifying ACL, matching the upload method)
             try {
                 $uploadedPath = Storage::disk('s3')->putFileAs(
                     $directory,
@@ -183,8 +182,8 @@ class UploadController extends Controller
             \Log::error('S3 Upload Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json(['success' => false, 'message' => 'File upload failed: ' . $e->getMessage()], 500);
         }
-    
-}
+
+    }
 
 
     /**
