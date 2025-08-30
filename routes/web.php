@@ -7,8 +7,15 @@ use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\S3FileUploadController;
 use App\Http\Controllers\UploadController;
 
+use App\Http\Controllers\ShopController;
+
+
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
+Route::get('/shop/{id}/customize', [ShopController::class, 'customize'])->name('shop.customize');
+Route::post('/shop/{id}/customize', [ShopController::class, 'storeCustomization'])->name('shop.storeCustomization');
 
 
 
