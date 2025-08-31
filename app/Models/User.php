@@ -21,6 +21,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'plan_id',
+        'reference_selfie_path'
     ];
 
     /**
@@ -31,6 +33,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+
     ];
 
     /**
@@ -45,4 +48,11 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+
+     public function plan()
+    {
+        return $this->belongsTo(Plan::class);
+    }
+
 }
