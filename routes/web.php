@@ -18,10 +18,17 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+use App\Http\Controllers\ShopController;
+
+
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Route::view('/login', 'auth.login')->name('login');
+Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
+Route::get('/shop/{id}/customize', [ShopController::class, 'customize'])->name('shop.customize');
+Route::post('/shop/{id}/customize', [ShopController::class, 'storeCustomization'])->name('shop.storeCustomization');
+
 
 
 Route::get('/about', function () {
