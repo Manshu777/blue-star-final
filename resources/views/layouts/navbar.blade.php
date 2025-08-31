@@ -14,7 +14,7 @@
                 </form>
             @else
                 <a href="{{ route('login') }}" class="hover:text-gray-300">Login</a>
-                <a href="{{ route('register') }}" class="hover:text-gray-300">Register</a>
+                
             @endauth
         </div>
     </div>
