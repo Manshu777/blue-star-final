@@ -6,6 +6,17 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\S3FileUploadController;
 use App\Http\Controllers\UploadController;
+use App\Http\Controllers\AuthController;
+
+
+
+Route::get('/signup', [AuthController::class, 'showSignupForm'])->name('signup');
+Route::post('/signup', [AuthController::class, 'signup'])->name('signup.post');
+
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 use App\Http\Controllers\ShopController;
 
@@ -13,12 +24,24 @@ use App\Http\Controllers\ShopController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+// Route::view('/login', 'auth.login')->name('login');
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/shop/{id}/customize', [ShopController::class, 'customize'])->name('shop.customize');
 Route::post('/shop/{id}/customize', [ShopController::class, 'storeCustomization'])->name('shop.storeCustomization');
 
 
 
+Route::get('/about', function () {
+    return view('about.about');
+});
+
+Route::get('/contact', function () {
+    return view('contact.contact');
+});
+
+Route::get('/pricing', function () {
+    return view('pricing.pricing');
+});
 
 
 Route::post('photos', [UploadController::class, 'store'])->name('photos.store');
@@ -28,7 +51,10 @@ Route::post('photos/{photo}', [UploadController::class, 'update'])->name('photos
 Route::delete('photos/{photo}', [UploadController::class, 'destroy'])->name('photos.destroy');
 
 
-Route::view('/login', 'auth.login')->name('login');
+
+
+
+
 
 Route::get('/dashboard', [ProfileController::class, 'index'])->name('user.dashboard');
 
