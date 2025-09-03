@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en" class="light">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,26 +14,23 @@
     <style>
         .drag-drop-zone {
             border: 2px dashed #ccc;
-            transition: border-color 0.3s ease;
+            transition: border-color 0.3s ease, background-color 0.3s ease;
         }
-
         .drag-drop-zone.dragover {
             border-color: #3b82f6;
             background-color: #eff6ff;
         }
-
         .preview-canvas,
         .preview-video {
             max-height: 400px;
             width: 100%;
             object-fit: contain;
+            border-radius: 0.5rem;
         }
-
         .edit-tools button {
             margin-right: 0.5rem;
             margin-bottom: 0.5rem;
         }
-
         .pro-badge {
             background-color: #FFD700;
             color: #000;
@@ -43,97 +39,83 @@
             font-size: 0.75rem;
             margin-left: 0.5rem;
         }
-
         /* Dark mode styles */
         html.dark .bg-gray-50 {
             background-color: #1f2937;
         }
-
         html.dark .text-gray-800 {
             color: #f3f4f6;
         }
-
         html.dark .bg-white {
             background-color: #374151;
         }
-
         html.dark .text-gray-700 {
             color: #d1d5db;
         }
-
         html.dark .bg-gray-200 {
             background-color: #4b5563;
         }
-
         html.dark .text-gray-500 {
             color: #9ca3af;
         }
-
         html.dark .border-gray-300 {
             border-color: #4b5563;
         }
-
         html.dark .bg-green-100 {
             background-color: #064e3b;
         }
-
         html.dark .text-green-700 {
             color: #34d399;
         }
-
         html.dark .border-green-500 {
             border-color: #059669;
         }
-
         html.dark .bg-red-100 {
             background-color: #7f1d1d;
         }
-
         html.dark .text-red-700 {
             color: #f87171;
         }
-
         html.dark .border-red-500 {
             border-color: #ef4444;
         }
-
         html.dark .bg-blue-100 {
             background-color: #1e3a8a;
         }
-
         html.dark .text-blue-700 {
             color: #60a5fa;
         }
-
         html.dark .bg-green-100 {
             background-color: #064e3b;
         }
-
         html.dark .text-green-700 {
             color: #34d399;
         }
-
         html.dark .bg-blue-200 {
             background-color: #1e40af;
         }
-
         html.dark .pro-badge {
             background-color: #a16207;
             color: #fffbeb;
         }
-
         /* Sidebar transitions */
         .sidebar {
             transition: width 0.3s ease-in-out;
         }
-
         /* Overlay for mobile sidebar */
         .overlay {
             transition: opacity 0.3s ease-in-out;
         }
+        /* Improved design */
+        .form-input {
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .form-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
     </style>
 </head>
-
 <body class="bg-gray-50 min-h-screen font-sans antialiased"
     x-data="{ tab: 'upload', sidebarOpen: false, isMobile: window.innerWidth < 768, darkMode: false }"
     @resize.window="isMobile = window.innerWidth < 768; if (isMobile && sidebarOpen) sidebarOpen = false;">
@@ -141,7 +123,6 @@
         <!-- Sidebar Overlay for Mobile -->
         <div x-show="isMobile && sidebarOpen" class="overlay fixed inset-0 bg-black bg-opacity-50 z-30"
             @click="sidebarOpen = false"></div>
-
         <!-- Sidebar -->
         <aside class="sidebar bg-white dark:bg-gray-800 shadow-lg flex flex-col overflow-hidden"
             :class="{ 'w-64': sidebarOpen, 'w-0': !sidebarOpen, 'fixed h-full z-40': isMobile, 'relative': !isMobile }">
@@ -207,7 +188,6 @@
                 </div>
             </div>
         </aside>
-
         <!-- Main Content -->
         <main class="flex-grow overflow-y-auto" :class="{ '': sidebarOpen && !isMobile }">
             <div class="container mx-auto px-4 py-8">
@@ -221,7 +201,6 @@
                         </svg>
                     </button>
                 </div>
-
                 <!-- Sections -->
                 <!-- Upload Media Section -->
                 <div x-show="tab === 'upload'" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
@@ -252,7 +231,6 @@
                             </ul>
                         </div>
                     @endif
-
                     <!-- Form -->
                     <form action="{{ route('photos.store') }}" method="POST" enctype="multipart/form-data"
                         @submit.prevent="handleSubmit" x-data="uploadFormData()">
@@ -265,10 +243,9 @@
                             <div class="drag-drop-zone rounded-lg p-6 text-center cursor-pointer bg-gray-50 dark:bg-gray-700"
                                 :class="{ 'dragover': isDragging }" @dragover.prevent="isDragging = true"
                                 @dragleave.prevent="isDragging = false" @drop.prevent="handleDrop($event)">
-                                <p class="text-gray-500 dark:text-gray-400">Drag & drop files here, or click to select
-                                </p>
-                                <input type="file" name="file" id="file" class="hidden"
-                                    accept="image/jpeg,image/png,video/mp4,video/quicktime"
+                                <p class="text-gray-500 dark:text-gray-400">Drag & drop files here, or click to select (multiple allowed)</p>
+                                <input type="file" name="files[]" id="file" class="hidden"
+                                    accept="image/jpeg,image/png,video/mp4,video/quicktime" multiple
                                     @change="handleFileChange($event)" x-ref="fileInput">
                                 <button type="button"
                                     class="mt-2 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 py-1 px-3 rounded-full text-sm"
@@ -282,86 +259,85 @@
                                 </button>
                             </div>
                             <!-- Preview -->
-                            <div x-show="preview"
-                                class="mt-4 border border-gray-300 dark:border-gray-600 rounded-lg p-2 bg-white dark:bg-gray-700">
-                                <img :src="preview" alt="Preview" class="preview-canvas mx-auto rounded-lg shadow"
-                                    x-show="file && file.type.startsWith('image/')">
-                                <video id="preview-video" :src="preview" controls
-                                    class="preview-video mx-auto rounded-lg shadow"
-                                    x-show="file && file.type.startsWith('video/')"></video>
+                            <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4" x-show="previews.length > 0">
+                                <template x-for="(preview, index) in previews" :key="index">
+                                    <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-2 bg-white dark:bg-gray-700">
+                                        <img :src="preview.url" alt="Preview" class="preview-canvas mx-auto rounded-lg shadow"
+                                            x-show="preview.type.startsWith('image/')">
+                                        <video :id="'preview-video-' + index" :src="preview.url" controls
+                                            class="preview-video mx-auto rounded-lg shadow"
+                                            x-show="preview.type.startsWith('video/')"></video>
+                                    </div>
+                                </template>
                             </div>
-                            @error('file')
+                            @error('files.*')
                                 <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror
                         </div>
-
-                        <!-- Title, Description, Price, License, Featured, Tags -->
+                        <!-- Title, Description, License, Featured, Tags -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <div>
                                 <label for="title"
                                     class="block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
-                                <input type="text" name="title" id="title"
-                                    class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                <input type="text" name="title" id="title" placeholder="Enter media title"
+                                    class="form-input mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                     required>
                             </div>
                             <div>
-                                <label for="price"
-                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Price</label>
-                                <input type="number" name="price" id="price" step="0.01" min="0"
-                                    class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                <label for="folder_name"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Folder/Memory Name</label>
+                                <input type="text" name="folder_name" id="folder_name" placeholder="Enter folder or memory name"
+                                    class="form-input mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                     required>
                             </div>
                         </div>
                         <div class="mb-4">
                             <label for="description"
                                 class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
-                            <textarea name="description" id="description" rows="3"
-                                class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"></textarea>
+                            <textarea name="description" id="description" rows="3" placeholder="Enter description"
+                                class="form-input mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"></textarea>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <label for="license_type"
-                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">License
-                                    Type</label>
-                                <select name="license_type" id="license_type"
-                                    class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                                    required>
-                                    <option value="personal">Personal</option>
-                                    <option value="commercial">Commercial</option>
-                                </select>
-                            </div>
-                            <div class="flex items-center mt-6 md:mt-0">
-                                <input type="checkbox" name="is_featured" id="is_featured" value="1" {{ old('is_featured') ? 'checked' : '' }}
-                                    class="h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500">
-                                <label for="is_featured" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
-                                    Mark as Featured
-                                </label>
-                            </div>
-                        </div>
-
-                        @error('is_featured')
-                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                        @enderror
-
-                        <div class="mb-6">
-                            <label for="tags" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tags
-                                (AI Auto-Tags +
-                                Custom)</label>
-                            <input type="text" name="tags" id="tags"
-                                class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                                placeholder="e.g., nature, portrait" x-model="tags">
-                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">AI auto-tags: faces, date/time,
-                                location. Edit as needed.
-                            </p>
-                        </div>
-
+                        <!--<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">-->
+                        <!--    <div>-->
+                        <!--        <label for="license_type"-->
+                        <!--            class="block text-sm font-medium text-gray-700 dark:text-gray-300">License-->
+                        <!--            Type</label>-->
+                        <!--        <select name="license_type" id="license_type"-->
+                        <!--            class="form-input mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"-->
+                        <!--            required>-->
+                        <!--            <option value="personal">Personal</option>-->
+                        <!--            <option value="commercial">Commercial</option>-->
+                        <!--        </select>-->
+                        <!--    </div>-->
+                        <!--    <div class="flex items-center mt-6 md:mt-0">-->
+                        <!--        <input type="checkbox" name="is_featured" id="is_featured" value="1" {{ old('is_featured') ? 'checked' : '' }}-->
+                        <!--            class="h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500">-->
+                        <!--        <label for="is_featured" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">-->
+                        <!--            Mark as Featured-->
+                        <!--        </label>-->
+                        <!--    </div>-->
+                        <!--</div>-->
+                        <!--@error('is_featured')-->
+                        <!--    <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>-->
+                        <!--@enderror-->
+                        <!--<div class="mb-6">-->
+                        <!--    <label for="tags" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tags-->
+                        <!--        (AI Auto-Tags +-->
+                        <!--        Custom)</label>-->
+                        <!--    <input type="text" name="tags" id="tags" placeholder="e.g., nature, portrait"-->
+                        <!--        class="form-input mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"-->
+                        <!--        x-model="tags">-->
+                        <!--    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">AI auto-tags: faces, date/time,-->
+                        <!--        location. Edit as needed.-->
+                        <!--    </p>-->
+                        <!--</div>-->
+                        <input type="hidden" name="location" x-model="location">
                         <!-- Progress Bar -->
                         <div x-show="progress > 0" class="mb-4">
                             <div class="bg-gray-200 dark:bg-gray-600 rounded-full h-2.5">
                                 <div class="bg-blue-600 h-2.5 rounded-full" :style="{ width: progress + '%' }"></div>
                             </div>
                         </div>
-
                         <!-- Submit -->
                         <button type="submit"
                             class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-200 font-medium">
@@ -369,7 +345,6 @@
                         </button>
                     </form>
                 </div>
-
                 <!-- Edit & Enhance Section -->
                 <div x-show="tab === 'edit'" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
                     <h2 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">AI-Powered Edit &
@@ -454,7 +429,6 @@
                             controls></video>
                     </div>
                 </div>
-
                 <!-- Advanced Editing Tools (Pro) -->
                 <div x-show="tab === 'advanced'" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
                     <h2 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">Advanced Editing Tools
@@ -527,7 +501,6 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Collaborate & Share Section -->
                 <div x-show="tab === 'collaborate'" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
                     <h2 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">Collaborate & Share
@@ -545,7 +518,6 @@
                             <button class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">Create
                                 Album</button>
                         </div>
-
                         <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
                             <h3 class="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">Comment & Feedback
                             </h3>
@@ -561,7 +533,6 @@
                                     class="flex-1 bg-yellow-600 text-white py-2 px-4 rounded-lg hover:bg-yellow-700">Vote</button>
                             </div>
                         </div>
-
                         <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
                             <h3 class="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">Share Media</h3>
                             <p class="text-gray-700 dark:text-gray-300 mb-4">Share to social media or export to cloud.
@@ -575,7 +546,6 @@
                                     to Cloud</button>
                             </div>
                         </div>
-
                         <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
                             <h3 class="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">Watermark Removal
                                 (Pro) <span class="pro-badge">Pro</span></h3>
@@ -586,7 +556,6 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Pricing Section -->
                 <div x-show="tab === 'pricing'" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
                     <h2 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">Pricing & Subscription
@@ -623,7 +592,6 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Future Features Section -->
                 <div x-show="tab === 'future'" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
                     <h2 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">Future Feature
@@ -643,32 +611,35 @@
             </div>
         </main>
     </div>
-
     <script>
         function uploadFormData() {
             return {
-                file: null,
-                preview: null,
+                files: [],
+                previews: [],
                 isDragging: false,
                 progress: 0,
                 tags: '',
+                location: '',
                 init() {
-                    this.$watch('file', () => {
-                        if (this.file) {
-                            this.preview = URL.createObjectURL(this.file);
-                            this.extractExif();
-                            if (this.file.type.startsWith('video/')) {
-                                videojs('preview-video');
+                    this.getGeolocation();
+                    this.$watch('files', () => {
+                        this.previews = [];
+                        for (let file of this.files) {
+                            const url = URL.createObjectURL(file);
+                            this.previews.push({ url, type: file.type });
+                            this.extractExif(file);
+                            if (file.type.startsWith('video/')) {
+                                // Initialize videojs if needed, but since multiple, handle dynamically
                             }
                         }
                     });
                 },
                 handleFileChange(event) {
-                    this.file = event.target.files[0];
+                    this.files = Array.from(event.target.files);
                 },
                 handleDrop(event) {
                     this.isDragging = false;
-                    this.file = event.dataTransfer.files[0];
+                    this.files = Array.from(event.dataTransfer.files);
                     document.querySelector('#file').files = event.dataTransfer.files;
                 },
                 captureFromCamera() {
@@ -676,17 +647,31 @@
                     input.setAttribute('capture', 'environment');
                     input.click();
                 },
-                extractExif() {
-                    if (this.file && this.file.type.startsWith('image/')) {
-                        EXIF.getData(this.file, () => {
-                            const date = EXIF.getTag(this.file, 'DateTimeOriginal') || '';
-                            const lat = EXIF.getTag(this.file, 'GPSLatitude') || '';
-                            const lon = EXIF.getTag(this.file, 'GPSLongitude') || '';
+                extractExif(file) {
+                    if (file && file.type.startsWith('image/')) {
+                        EXIF.getData(file, () => {
+                            const date = EXIF.getTag(file, 'DateTimeOriginal') || '';
+                            const lat = EXIF.getTag(file, 'GPSLatitude') || '';
+                            const lon = EXIF.getTag(file, 'GPSLongitude') || '';
                             let autoTags = [];
                             if (date) autoTags.push(`date:${date}`);
                             if (lat && lon) autoTags.push(`location:${lat},${lon}`);
                             autoTags.push('face_detected');
-                            this.tags = autoTags.join(',');
+                            this.tags = [...new Set([...this.tags.split(','), ...autoTags])].join(',');
+                        });
+                    }
+                },
+                getGeolocation() {
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition((position) => {
+                            this.location = `${position.coords.latitude},${position.coords.longitude}`;
+                            if (this.tags) {
+                                this.tags += `,location:${this.location}`;
+                            } else {
+                                this.tags = `location:${this.location}`;
+                            }
+                        }, (error) => {
+                            console.error('Geolocation error:', error);
                         });
                     }
                 },
@@ -711,7 +696,6 @@
                 }
             };
         }
-
         function editData() {
             return {
                 canvas: null,
@@ -792,7 +776,6 @@
                 }
             };
         }
-
         function advancedEditData() {
             return {
                 backgroundBlur() {
@@ -832,5 +815,4 @@
         }
     </script>
 </body>
-
 </html>
