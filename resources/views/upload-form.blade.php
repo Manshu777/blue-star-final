@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Upload & Collaborate: Seamless Photo and Video Management</title>
+    <title>User Panel Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
@@ -32,8 +32,8 @@
             margin-bottom: 0.5rem;
         }
         .pro-badge {
-            background-color: #FFD700;
-            color: #000;
+            background-color: #3b82f6;
+            color: #fff;
             padding: 2px 6px;
             border-radius: 4px;
             font-size: 0.75rem;
@@ -61,52 +61,22 @@
         html.dark .border-gray-300 {
             border-color: #4b5563;
         }
-        html.dark .bg-green-100 {
-            background-color: #064e3b;
-        }
-        html.dark .text-green-700 {
-            color: #34d399;
-        }
-        html.dark .border-green-500 {
-            border-color: #059669;
-        }
-        html.dark .bg-red-100 {
-            background-color: #7f1d1d;
-        }
-        html.dark .text-red-700 {
-            color: #f87171;
-        }
-        html.dark .border-red-500 {
-            border-color: #ef4444;
-        }
         html.dark .bg-blue-100 {
             background-color: #1e3a8a;
         }
         html.dark .text-blue-700 {
             color: #60a5fa;
         }
-        html.dark .bg-green-100 {
-            background-color: #064e3b;
-        }
-        html.dark .text-green-700 {
-            color: #34d399;
-        }
-        html.dark .bg-blue-200 {
-            background-color: #1e40af;
-        }
         html.dark .pro-badge {
-            background-color: #a16207;
-            color: #fffbeb;
+            background-color: #1e40af;
+            color: #fff;
         }
-        /* Sidebar transitions */
         .sidebar {
             transition: width 0.3s ease-in-out;
         }
-        /* Overlay for mobile sidebar */
         .overlay {
             transition: opacity 0.3s ease-in-out;
         }
-        /* Improved design */
         .form-input {
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
@@ -117,73 +87,73 @@
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen font-sans antialiased"
-    x-data="{ tab: 'upload', sidebarOpen: false, isMobile: window.innerWidth < 768, darkMode: false }"
-    @resize.window="isMobile = window.innerWidth < 768; if (isMobile && sidebarOpen) sidebarOpen = false;">
+      x-data="{ tab: 'dashboard', sidebarOpen: false, isMobile: window.innerWidth < 768, darkMode: false }"
+      @resize.window="isMobile = window.innerWidth < 768; if (isMobile && sidebarOpen) sidebarOpen = false;">
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar Overlay for Mobile -->
         <div x-show="isMobile && sidebarOpen" class="overlay fixed inset-0 bg-black bg-opacity-50 z-30"
-            @click="sidebarOpen = false"></div>
+             @click="sidebarOpen = false"></div>
         <!-- Sidebar -->
         <aside class="sidebar bg-white dark:bg-gray-800 shadow-lg flex flex-col overflow-hidden"
-            :class="{ 'w-64': sidebarOpen, 'w-0': !sidebarOpen, 'fixed h-full z-40': isMobile, 'relative': !isMobile }">
-            <div class="flex items-center justify-between p-4 border-b dark:border-gray-700">
-                <h2 class="text-xl font-bold text-gray-800 dark:text-white">Dashboard</h2>
+               :class="{ 'w-64': sidebarOpen, 'w-0': !sidebarOpen, 'fixed h-full z-40': isMobile, 'relative': !isMobile }">
+            <div class="flex items-center justify-between p-2 border-b dark:border-gray-700">
+                <h2 class="text-xl font-bold text-gray-800 dark:text-white">User Dashboard</h2>
                 <button @click="sidebarOpen = !sidebarOpen" class="text-gray-600 dark:text-gray-300 md:hidden">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
-            <nav class="flex-grow overflow-y-auto p-4">
+            <nav class="flex-grow overflow-y-auto p-2">
                 <ul class="space-y-2">
                     <li>
+                        <button @click="tab = 'dashboard'; if(isMobile) sidebarOpen = false"
+                                class="w-full text-left px-4 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-gray-600 transition"
+                                :class="{ 'bg-blue-600 text-white': tab === 'dashboard', 'text-gray-800 dark:text-white': tab !== 'dashboard' }">
+                            Dashboard
+                        </button>
+                    </li>
+                    <li>
                         <button @click="tab = 'upload'; if(isMobile) sidebarOpen = false"
-                            class="w-full text-left px-4 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-gray-600 transition"
-                            :class="{ 'bg-blue-600 text-white': tab === 'upload', 'text-gray-800 dark:text-white': tab !== 'upload' }">Upload
-                            Media</button>
+                                class="w-full text-left px-4 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-gray-600 transition"
+                                :class="{ 'bg-blue-600 text-white': tab === 'upload', 'text-gray-800 dark:text-white': tab !== 'upload' }">
+                            Upload Media
+                        </button>
                     </li>
                     <li>
                         <button @click="tab = 'edit'; if(isMobile) sidebarOpen = false"
-                            class="w-full text-left px-4 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-gray-600 transition"
-                            :class="{ 'bg-blue-600 text-white': tab === 'edit', 'text-gray-800 dark:text-white': tab !== 'edit' }">Edit
-                            & Enhance</button>
+                                class="w-full text-left px-4 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-gray-600 transition"
+                                :class="{ 'bg-blue-600 text-white': tab === 'edit', 'text-gray-800 dark:text-white': tab !== 'edit' }">
+                            Edit & Enhance
+                        </button>
                     </li>
                     <li>
-                        <button @click="tab = 'collaborate'; if(isMobile) sidebarOpen = false"
-                            class="w-full text-left px-4 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-gray-600 transition"
-                            :class="{ 'bg-blue-600 text-white': tab === 'collaborate', 'text-gray-800 dark:text-white': tab !== 'collaborate' }">Collaborate
-                            & Share</button>
+                        <button @click="tab = 'subscriptions'; if(isMobile) sidebarOpen = false"
+                                class="w-full text-left px-4 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-gray-600 transition"
+                                :class="{ 'bg-blue-600 text-white': tab === 'subscriptions', 'text-gray-800 dark:text-white': tab !== 'subscriptions' }">
+                            Subscription Plans
+                        </button>
                     </li>
                     <li>
-                        <button @click="tab = 'advanced'; if(isMobile) sidebarOpen = false"
-                            class="w-full text-left px-4 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-gray-600 transition"
-                            :class="{ 'bg-blue-600 text-white': tab === 'advanced', 'text-gray-800 dark:text-white': tab !== 'advanced' }">Advanced
-                            Features (Pro)</button>
-                    </li>
-                    <li>
-                        <button @click="tab = 'pricing'; if(isMobile) sidebarOpen = false"
-                            class="w-full text-left px-4 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-gray-600 transition"
-                            :class="{ 'bg-blue-600 text-white': tab === 'pricing', 'text-gray-800 dark:text-white': tab !== 'pricing' }">Pricing</button>
-                    </li>
-                    <li>
-                        <button @click="tab = 'future'; if(isMobile) sidebarOpen = false"
-                            class="w-full text-left px-4 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-gray-600 transition"
-                            :class="{ 'bg-blue-600 text-white': tab === 'future', 'text-gray-800 dark:text-white': tab !== 'future' }">Future
-                            Features</button>
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit"
+                                    class="w-full text-left px-4 py-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-600 transition text-gray-800 dark:text-white">
+                                Logout
+                            </button>
+                        </form>
                     </li>
                 </ul>
             </nav>
-            <div class="p-4 border-t dark:border-gray-700">
+            <div class="p-2 border-t dark:border-gray-700">
                 <div class="flex items-center justify-between">
                     <span class="text-gray-700 dark:text-gray-300">Dark Mode</span>
                     <button @click="darkMode = !darkMode; document.documentElement.classList.toggle('dark', darkMode)"
-                        class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                        :class="{ 'bg-blue-600': darkMode }">
+                            class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 dark:bg-gray-600 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                            :class="{ 'bg-blue-600': darkMode }">
                         <span class="sr-only">Toggle dark mode</span>
-                        <span
-                            class="pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-                            :class="{ 'translate-x-5': darkMode, 'translate-x-0': !darkMode }"></span>
+                        <span class="pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                              :class="{ 'translate-x-5': darkMode, 'translate-x-0': !darkMode }"></span>
                     </button>
                 </div>
             </div>
@@ -192,23 +162,42 @@
         <main class="flex-grow overflow-y-auto" :class="{ '': sidebarOpen && !isMobile }">
             <div class="container mx-auto px-4 py-8">
                 <div class="flex items-center justify-between mb-8">
-                    <h1 class="text-2xl md:text-4xl font-bold text-gray-800 dark:text-white">Upload & Collaborate:
-                        Seamless Photo and Video Management</h1>
+                    <h1 class="text-2xl md:text-4xl font-bold text-gray-800 dark:text-white">User Panel Dashboard</h1>
                     <button @click="sidebarOpen = true" class="text-gray-600 dark:text-gray-300">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 6h16M4 12h16M4 18h16" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                     </button>
                 </div>
-                <!-- Sections -->
+                <!-- Dashboard Section -->
+                <div x-show="tab === 'dashboard'" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+                    <h2 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">Dashboard Overview</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div class="bg-blue-100 dark:bg-blue-900 p-4 rounded-lg text-center">
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Total Uploads</h3>
+                            <p class="text-2xl font-bold text-blue-600 dark:text-blue-300">100</p>
+                        </div>
+                        <div class="bg-blue-100 dark:bg-blue-900 p-4 rounded-lg text-center">
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Storage Used</h3>
+                            <p class="text-2xl font-bold text-blue-600 dark:text-blue-300"> 100 MB</p>
+                        </div>
+                        <div class="bg-blue-100 dark:bg-blue-900 p-4 rounded-lg text-center">
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Active Plan</h3>
+                            <p class="text-2xl font-bold text-blue-600 dark:text-blue-300">{{ auth()->user()->subscription ? auth()->user()->subscription->plan_name : 'Free' }}</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Recent Activity</h3>
+                        <ul class="space-y-2">
+                    
+                        </ul>
+                    </div>
+                </div>
                 <!-- Upload Media Section -->
                 <div x-show="tab === 'upload'" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
                     <h2 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">Upload Media</h2>
-                    <!-- Success/Error Messages -->
                     @if (session('success'))
-                        <div class="bg-green-100 dark:bg-green-900 border-l-4 border-green-500 text-green-700 dark:text-green-200 p-4 mb-6 rounded"
-                            role="alert">
+                        <div class="bg-blue-100 dark:bg-blue-900 border-l-4 border-blue-500 text-blue-700 dark:text-blue-200 p-2 mb-6 rounded" role="alert">
                             {{ session('success') }}
                             @if (session('url'))
                                 <br><a href="{{ session('url') }}" class="underline font-medium" target="_blank">View Media</a>
@@ -216,14 +205,12 @@
                         </div>
                     @endif
                     @if (session('error'))
-                        <div class="bg-red-100 dark:bg-red-900 border-l-4 border-red-500 text-red-700 dark:text-red-200 p-4 mb-6 rounded"
-                            role="alert">
+                        <div class="bg-red-100 dark:bg-red-900 border-l-4 border-red-500 text-red-700 dark:text-red-200 p-2 mb-6 rounded" role="alert">
                             {{ session('error') }}
                         </div>
                     @endif
                     @if ($errors->any())
-                        <div class="bg-red-100 dark:bg-red-900 border-l-4 border-red-500 text-red-700 dark:text-red-200 p-4 mb-6 rounded"
-                            role="alert">
+                        <div class="bg-red-100 dark:bg-red-900 border-l-4 border-red-500 text-red-700 dark:text-red-200 p-2 mb-6 rounded" role="alert">
                             <ul>
                                 @foreach ($errors->all() as $error)
                                     <li>{{ $error }}</li>
@@ -231,382 +218,278 @@
                             </ul>
                         </div>
                     @endif
-                    <!-- Form -->
-                    <form action="{{ route('photos.store') }}" method="POST" enctype="multipart/form-data"
-                        @submit.prevent="handleSubmit" x-data="uploadFormData()">
-                        @csrf
-                        <!-- Media Selection -->
-                        <div class="mb-6">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Select
-                                Photos/Videos (Gallery or
-                                Camera - Live Events Supported)</label>
-                            <div class="drag-drop-zone rounded-lg p-6 text-center cursor-pointer bg-gray-50 dark:bg-gray-700"
-                                :class="{ 'dragover': isDragging }" @dragover.prevent="isDragging = true"
-                                @dragleave.prevent="isDragging = false" @drop.prevent="handleDrop($event)">
-                                <p class="text-gray-500 dark:text-gray-400">Drag & drop files here, or click to select (multiple allowed)</p>
-                                <input type="file" name="files[]" id="file" class="hidden"
-                                    accept="image/jpeg,image/png,video/mp4,video/quicktime" multiple
-                                    @change="handleFileChange($event)" x-ref="fileInput">
-                                <button type="button"
-                                    class="mt-2 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 py-1 px-3 rounded-full text-sm"
-                                    @click="$refs.fileInput.click()">
-                                    Browse Files
-                                </button>
-                                <button type="button"
-                                    class="mt-2 ml-2 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-200 py-1 px-3 rounded-full text-sm"
-                                    @click="captureFromCamera">
-                                    Use Camera (Live)
-                                </button>
-                            </div>
-                            <!-- Preview -->
-                            <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4" x-show="previews.length > 0">
-                                <template x-for="(preview, index) in previews" :key="index">
-                                    <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-2 bg-white dark:bg-gray-700">
-                                        <img :src="preview.url" alt="Preview" class="preview-canvas mx-auto rounded-lg shadow"
-                                            x-show="preview.type.startsWith('image/')">
-                                        <video :id="'preview-video-' + index" :src="preview.url" controls
-                                            class="preview-video mx-auto rounded-lg shadow"
-                                            x-show="preview.type.startsWith('video/')"></video>
-                                    </div>
-                                </template>
-                            </div>
-                            @error('files.*')
-                                <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        <!-- Title, Description, License, Featured, Tags -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <label for="title"
-                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
-                                <input type="text" name="title" id="title" placeholder="Enter media title"
-                                    class="form-input mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                                    required>
-                            </div>
-                            <div>
-                                <label for="folder_name"
-                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Folder/Memory Name</label>
-                                <input type="text" name="folder_name" id="folder_name" placeholder="Enter folder or memory name"
-                                    class="form-input mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                                    required>
-                            </div>
-                        </div>
-                        <div class="mb-4">
-                            <label for="description"
-                                class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
-                            <textarea name="description" id="description" rows="3" placeholder="Enter description"
-                                class="form-input mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"></textarea>
-                        </div>
-                        <!--<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">-->
-                        <!--    <div>-->
-                        <!--        <label for="license_type"-->
-                        <!--            class="block text-sm font-medium text-gray-700 dark:text-gray-300">License-->
-                        <!--            Type</label>-->
-                        <!--        <select name="license_type" id="license_type"-->
-                        <!--            class="form-input mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"-->
-                        <!--            required>-->
-                        <!--            <option value="personal">Personal</option>-->
-                        <!--            <option value="commercial">Commercial</option>-->
-                        <!--        </select>-->
-                        <!--    </div>-->
-                        <!--    <div class="flex items-center mt-6 md:mt-0">-->
-                        <!--        <input type="checkbox" name="is_featured" id="is_featured" value="1" {{ old('is_featured') ? 'checked' : '' }}-->
-                        <!--            class="h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500">-->
-                        <!--        <label for="is_featured" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">-->
-                        <!--            Mark as Featured-->
-                        <!--        </label>-->
-                        <!--    </div>-->
-                        <!--</div>-->
-                        <!--@error('is_featured')-->
-                        <!--    <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>-->
-                        <!--@enderror-->
-                        <!--<div class="mb-6">-->
-                        <!--    <label for="tags" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tags-->
-                        <!--        (AI Auto-Tags +-->
-                        <!--        Custom)</label>-->
-                        <!--    <input type="text" name="tags" id="tags" placeholder="e.g., nature, portrait"-->
-                        <!--        class="form-input mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"-->
-                        <!--        x-model="tags">-->
-                        <!--    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">AI auto-tags: faces, date/time,-->
-                        <!--        location. Edit as needed.-->
-                        <!--    </p>-->
-                        <!--</div>-->
-                        <input type="hidden" name="location" x-model="location">
-                        <!-- Progress Bar -->
-                        <div x-show="progress > 0" class="mb-4">
-                            <div class="bg-gray-200 dark:bg-gray-600 rounded-full h-2.5">
-                                <div class="bg-blue-600 h-2.5 rounded-full" :style="{ width: progress + '%' }"></div>
-                            </div>
-                        </div>
-                        <!-- Submit -->
-                        <button type="submit"
-                            class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-200 font-medium">
-                            Upload Media
+                   
+                           <form action="{{ route('photos.store') }}" method="POST" enctype="multipart/form-data"
+          @submit.prevent="handleSubmit" x-data="uploadFormData()">
+        @csrf
+        <!-- Media Selection -->
+        <div class="mb-6 relative group">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Select Photos/Videos
+                <span class="text-xs text-gray-500 dark:text-gray-400">(JPEG, PNG, MP4, MOV, max 5MB)</span>
+            </label>
+            <div class="drag-drop-zone rounded-lg p-6 text-center cursor-pointer bg-gray-50 dark:bg-gray-700 border-2 border-dashed"
+                 :class="{ 'dragover': isDragging }" @dragover.prevent="isDragging = true"
+                 @dragleave.prevent="isDragging = false" @drop.prevent="handleDrop($event)">
+                <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V8m0 0l-4 4m4-4l4 4m6-4v8m0 0h-4m4 0h4" />
+                </svg>
+                <p class="text-gray-500 dark:text-gray-400">Drag & drop files here, or click to select (multiple allowed)</p>
+                <input type="file" name="files[]" id="file" class="hidden"
+                       accept="image/jpeg,image/png,video/mp4,video/quicktime" multiple
+                       @change="handleFileChange($event)" x-ref="fileInput">
+                <div class="flex justify-center space-x-2 mt-2">
+                    <button type="button"
+                            class="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 py-1 px-3 rounded-full text-sm hover:bg-blue-200 dark:hover:bg-blue-800 transition"
+                            @click="$refs.fileInput.click()">
+                        <svg class="inline h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Browse Files
+                    </button>
+                    <button type="button"
+                            class="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-200 py-1 px-3 rounded-full text-sm hover:bg-green-200 dark:hover:bg-green-800 transition"
+                            @click="captureFromCamera">
+                        <svg class="inline h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h4l2-2h4l2 2h4a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                        </svg>
+                        Use Camera
+                    </button>
+                </div>
+                <!-- Tooltip -->
+                <div class="absolute top-0 right-0 mt-1 mr-1 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs rounded py-1 px-2">
+                    Tip: Upload multiple files for bulk processing. Use camera for live events.
+                </div>
+            </div>
+            <!-- Preview -->
+            <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4" x-show="previews.length > 0">
+                <template x-for="(preview, index) in previews" :key="index">
+                    <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-2 bg-white dark:bg-gray-700 relative group">
+                        <img :src="preview.url" alt="Preview" class="preview-canvas mx-auto rounded-lg shadow"
+                             x-show="preview.type.startsWith('image/')">
+                        <video :id="'preview-video-' + index" :src="preview.url" controls
+                               class="preview-video mx-auto rounded-lg shadow"
+                               x-show="preview.type.startsWith('video/')"></video>
+                        <button type="button"
+                                class="absolute top-1 right-1 bg-red-500 text-white rounded-full h-6 w-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                                @click="removePreview(index)">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
                         </button>
-                    </form>
+                    </div>
+                </template>
+            </div>
+            @error('files.*')
+                <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <!-- Form Fields -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div class="relative group">
+                <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
+                <input type="text" name="title" id="title" placeholder="Enter media title"
+                       class="form-input p-2 mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                       required>
+                <div class="absolute top-0 right-0 mt-1 mr-1 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs rounded py-1 px-2">
+                    Tip: Use a descriptive title for your photo/video.
+                </div>
+                @error('title')
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                @enderror
+            </div>
+            <div class="relative group">
+                <label for="event" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Event/Folder Name</label>
+                <input type="text" name="event" id="event" placeholder="Enter event or folder name"
+                       class="form-input p-2 mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                       required>
+                <div class="absolute top-0 right-0 mt-1 mr-1 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs rounded py-1 px-2">
+                    Tip: Group media by event or folder (e.g., "Wedding 2025").
+                </div>
+                @error('event')
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                @enderror
+            </div>
+        </div>
+        <div class="mb-4 relative group">
+            <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+            <textarea name="description" id="description" rows="3" placeholder="Describe your media"
+                      class="form-input p-2 mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"></textarea>
+            <div class="absolute top-0 right-0 mt-1 mr-1 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs rounded py-1 px-2">
+                Tip: Add details to make your media searchable.
+            </div>
+            @error('description')
+                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+            @enderror
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <!-- <div class="relative group">
+                <label for="price" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Price ($)</label>
+                <input type="number" name="price" id="price" placeholder="Enter price (e.g., 10.99)" step="0.01" min="0"
+                       class="form-input p-2 mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                       required>
+                <div class="absolute top-0 right-0 mt-1 mr-1 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs rounded py-1 px-2">
+                    Tip: Set a price for selling your media.
+                </div>
+                @error('price')
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                @enderror
+            </div> -->
+            <!-- <div class="relative group">
+                <label for="license_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300">License Type</label>
+                <select name="license_type" id="license_type"
+                        class="form-input p-2 mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                        required>
+                    <option value="" disabled selected>Select license type</option>
+                    <option value="personal">Personal</option>
+                    <option value="commercial">Commercial</option>
+                </select>
+                <div class="absolute top-0 right-0 mt-1 mr-1 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs rounded py-1 px-2">
+                    Tip: Choose "Commercial" for business use, "Personal" for private use.
+                </div>
+                @error('license_type')
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                @enderror
+            </div> -->
+        </div>
+        <div class="mb-4 relative group">
+            <label for="tags" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tags (AI Auto-Tags + Custom)</label>
+            <input type="text" name="tags" id="tags" placeholder="e.g., nature, portrait, wedding"
+                   class="form-input p-2 mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                   x-model="tags">
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">AI auto-tags: faces, date/time, location. Add custom tags, separated by commas.</p>
+            <div class="absolute top-0 right-0 mt-1 mr-1 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs rounded py-1 px-2">
+                Tip: Tags help users find your media in searches.
+            </div>
+            @error('tags')
+                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+            @enderror
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div class="relative group">
+                <label for="tour_provider" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tour Provider</label>
+                <input type="text" name="tour_provider" id="tour_provider" placeholder="Enter tour provider (e.g., Blue Star Tours)"
+                       class="form-input p-2 mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <div class="absolute top-0 right-0 mt-1 mr-1 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs rounded py-1 px-2">
+                    Tip: Specify the tour provider for event-based media.
+                </div>
+                @error('tour_provider')
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                @enderror
+            </div>
+            <div class="relative group">
+                <label for="location" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Location</label>
+                <input type="text" name="location" id="location" placeholder="Enter location (e.g., Paris, France)"
+                       class="form-input p-2 mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                       x-model="location">
+                <div class="absolute top-0 right-0 mt-1 mr-1 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs rounded py-1 px-2">
+                    Tip: Auto-filled by geolocation, but you can edit it.
+                </div>
+                @error('location')
+                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                @enderror
+            </div>
+        </div>
+        <div class="mb-6 relative group">
+            <div class="flex items-center">
+                <input type="checkbox" name="is_featured" id="is_featured" value="1"
+                       class="h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500"
+                       {{ old('is_featured') ? 'checked' : '' }}>
+                <label for="is_featured" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                    Mark as Featured
+                </label>
+                <div class="absolute right-0 mt-1 mr-1 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs rounded py-1 px-2">
+                    Tip: Featured media appears prominently in galleries.
+                </div>
+            </div>
+            @error('is_featured')
+                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <!-- Progress Bar -->
+        <div x-show="progress > 0" class="mb-4">
+            <div class="bg-gray-200 dark:bg-gray-600 rounded-full h-2.5">
+                <div class="bg-blue-600 h-2.5 rounded-full" :style="{ width: progress + '%' }"></div>
+            </div>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Uploading: <span x-text="progress + '%'"></span></p>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit"
+                class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-200 font-medium flex items-center justify-center">
+            <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Upload Media
+        </button>
+    </form>
                 </div>
                 <!-- Edit & Enhance Section -->
                 <div x-show="tab === 'edit'" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-                    <h2 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">AI-Powered Edit &
-                        Enhance</h2>
-                    <p class="text-center mb-6 text-gray-700 dark:text-gray-300">Open a photo/video to edit. (In full
-                        app, load from server; here, assume
-                        from upload preview)</p>
+                    <h2 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">Edit & Enhance</h2>
                     <div x-data="editData()">
                         <div class="edit-tools grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <div class="bg-gray-50 dark:bg-gray-700 p-2 rounded-lg">
                                 <h3 class="text-center font-medium mb-2 text-gray-800 dark:text-white">Basic Tools</h3>
                                 <div class="flex flex-wrap justify-center">
                                     <button type="button"
-                                        class="bg-gray-200 dark:bg-gray-600 py-1 px-3 rounded m-1 hover:bg-gray-300 dark:hover:bg-gray-500">Crop</button>
+                                            class="bg-gray-200 dark:bg-gray-600 py-1 px-3 rounded m-1 hover:bg-gray-300 dark:hover:bg-gray-500">Crop</button>
                                     <button type="button"
-                                        class="bg-gray-200 dark:bg-gray-600 py-1 px-3 rounded m-1 hover:bg-gray-300 dark:hover:bg-gray-500"
-                                        @click="rotate(90)">Rotate 90°</button>
+                                            class="bg-gray-200 dark:bg-gray-600 py-1 px-3 rounded m-1 hover:bg-gray-300 dark:hover:bg-gray-500"
+                                            @click="rotate(90)">Rotate 90°</button>
                                     <button type="button"
-                                        class="bg-gray-200 dark:bg-gray-600 py-1 px-3 rounded m-1 hover:bg-gray-300 dark:hover:bg-gray-500"
-                                        @click="rotate(-90)">Rotate -90°</button>
+                                            class="bg-gray-200 dark:bg-gray-600 py-1 px-3 rounded m-1 hover:bg-gray-300 dark:hover:bg-gray-500"
+                                            @click="rotate(-90)">Rotate -90°</button>
                                 </div>
-                                <div class="mt-2">
-                                    <label class="block text-sm text-gray-700 dark:text-gray-300">Brightness</label>
-                                    <input type="range" min="-100" max="100" x-model="brightness" @input="applyFilters"
-                                        class="w-full">
-                                </div>
-                                <div class="mt-2">
-                                    <label class="block text-sm text-gray-700 dark:text-gray-300">Contrast</label>
-                                    <input type="range" min="-100" max="100" x-model="contrast" @input="applyFilters"
-                                        class="w-full">
-                                </div>
-                                <button type="button"
-                                    class="w-full mt-2 bg-blue-600 text-white py-1 px-3 rounded hover:bg-blue-700"
-                                    @click="applyFilter">Apply Filter</button>
                             </div>
-                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                                <h3 class="text-center font-medium mb-2 text-gray-800 dark:text-white">Advanced AI Tools
-                                </h3>
+                            <div class="bg-gray-50 dark:bg-gray-700 p-2 rounded-lg">
+                                <h3 class="text-center font-medium mb-2 text-gray-800 dark:text-white">Advanced AI Tools <span class="pro-badge">Pro</span></h3>
                                 <div class="flex flex-wrap justify-center">
                                     <button type="button"
-                                        class="bg-gray-200 dark:bg-gray-600 py-1 px-3 rounded m-1 hover:bg-gray-300 dark:hover:bg-gray-500"
-                                        @click="sharpen">Sharpen (AI)</button>
+                                            class="bg-gray-200 dark:bg-gray-600 py-1 px-3 rounded m-1 hover:bg-gray-300 dark:hover:bg-gray-500"
+                                            @click="sharpen">Sharpen (AI)</button>
                                     <button type="button"
-                                        class="bg-gray-200 dark:bg-gray-600 py-1 px-3 rounded m-1 hover:bg-gray-300 dark:hover:bg-gray-500"
-                                        @click="colorCorrect">Color Correct (AI)</button>
-                                    <button type="button"
-                                        class="bg-gray-200 dark:bg-gray-600 py-1 px-3 rounded m-1 hover:bg-gray-300 dark:hover:bg-gray-500"
-                                        @click="removeBackground">Background Removal (AI)</button>
-                                    <button type="button"
-                                        class="bg-gray-200 dark:bg-gray-600 py-1 px-3 rounded m-1 hover:bg-gray-300 dark:hover:bg-gray-500"
-                                        @click="skinSmoothing">Skin Smoothing (AI)</button>
+                                            class="bg-gray-200 dark:bg-gray-600 py-1 px-3 rounded m-1 hover:bg-gray-300 dark:hover:bg-gray-500"
+                                            @click="colorCorrect">Color Correct (AI)</button>
                                 </div>
-                            </div>
-                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                                <h3 class="text-center font-medium mb-2 text-gray-800 dark:text-white">Fun Features</h3>
-                                <div class="flex flex-wrap justify-center">
-                                    <button type="button"
-                                        class="bg-gray-200 dark:bg-gray-600 py-1 px-3 rounded m-1 hover:bg-gray-300 dark:hover:bg-gray-500"
-                                        @click="addSticker">Add AR Sticker/Overlay</button>
-                                    <button type="button"
-                                        class="bg-gray-200 dark:bg-gray-600 py-1 px-3 rounded m-1 hover:bg-gray-300 dark:hover:bg-gray-500"
-                                        @click="addText">Add Text/Caption</button>
-                                    <button type="button"
-                                        class="bg-gray-200 dark:bg-gray-600 py-1 px-3 rounded m-1 hover:bg-gray-300 dark:hover:bg-gray-500"
-                                        @click="createGif">Create GIF</button>
-                                </div>
-                            </div>
-                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                                <h3 class="text-center font-medium mb-2 text-gray-800 dark:text-white">Preview & Save
-                                </h3>
-                                <button type="button"
-                                    class="w-full bg-blue-600 text-white py-2 px-3 rounded hover:bg-blue-700"
-                                    @click="previewSave">Preview & Save (Watermark Applied)</button>
                             </div>
                         </div>
-                        <!-- Canvas for Image Edit -->
                         <canvas id="edit-canvas"
-                            class="preview-canvas mx-auto mt-4 border border-gray-300 dark:border-gray-600 rounded-lg"></canvas>
-                        <!-- Video Player for Video Edit -->
-                        <video id="edit-video"
-                            class="preview-video mx-auto mt-4 video-js border border-gray-300 dark:border-gray-600 rounded-lg"
-                            controls></video>
+                                class="preview-canvas mx-auto mt-4 border border-gray-300 dark:border-gray-600 rounded-lg"></canvas>
                     </div>
                 </div>
-                <!-- Advanced Editing Tools (Pro) -->
-                <div x-show="tab === 'advanced'" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-                    <h2 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">Advanced Editing Tools
-                        (Pro Version)</h2>
-                    <div x-data="advancedEditData()">
-                        <div class="edit-tools grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                                <h3 class="text-center font-medium mb-2 text-gray-800 dark:text-white">AI-Powered
-                                    Backgrounds <span class="pro-badge">Pro</span></h3>
-                                <div class="flex flex-wrap justify-center">
-                                    <button type="button"
-                                        class="bg-gray-200 dark:bg-gray-600 py-1 px-3 rounded m-1 hover:bg-gray-300 dark:hover:bg-gray-500"
-                                        @click="backgroundBlur">Background Blur (Bokeh)</button>
-                                    <button type="button"
-                                        class="bg-gray-200 dark:bg-gray-600 py-1 px-3 rounded m-1 hover:bg-gray-300 dark:hover:bg-gray-500"
-                                        @click="virtualBackground">Virtual Backgrounds (AI)</button>
-                                </div>
-                            </div>
-                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                                <h3 class="text-center font-medium mb-2 text-gray-800 dark:text-white">Advanced AI
-                                    Filters <span class="pro-badge">Pro</span></h3>
-                                <div class="flex flex-wrap justify-center">
-                                    <button type="button"
-                                        class="bg-gray-200 dark:bg-gray-600 py-1 px-3 rounded m-1 hover:bg-gray-300 dark:hover:bg-gray-500"
-                                        @click="neuralStyle">Neural Style Transfer</button>
-                                    <button type="button"
-                                        class="bg-gray-200 dark:bg-gray-600 py-1 px-3 rounded m-1 hover:bg-gray-300 dark:hover:bg-gray-500"
-                                        @click="skinToneAdjust">Skin Tone Adjustment</button>
-                                </div>
-                            </div>
-                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                                <h3 class="text-center font-medium mb-2 text-gray-800 dark:text-white">Layer-Based
-                                    Editing <span class="pro-badge">Pro</span></h3>
-                                <div class="flex flex-wrap justify-center">
-                                    <button type="button"
-                                        class="bg-gray-200 dark:bg-gray-600 py-1 px-3 rounded m-1 hover:bg-gray-300 dark:hover:bg-gray-500"
-                                        @click="addLayer">Add Layer</button>
-                                    <button type="button"
-                                        class="bg-gray-200 dark:bg-gray-600 py-1 px-3 rounded m-1 hover:bg-gray-300 dark:hover:bg-gray-500"
-                                        @click="masking">Masking</button>
-                                </div>
-                            </div>
-                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                                <h3 class="text-center font-medium mb-2 text-gray-800 dark:text-white">Video Editing
-                                    <span class="pro-badge">Pro</span></h3>
-                                <div class="flex flex-wrap justify-center">
-                                    <button type="button"
-                                        class="bg-gray-200 dark:bg-gray-600 py-1 px-3 rounded m-1 hover:bg-gray-300 dark:hover:bg-gray-500"
-                                        @click="trimVideo">Trim & Cut</button>
-                                    <button type="button"
-                                        class="bg-gray-200 dark:bg-gray-600 py-1 px-3 rounded m-1 hover:bg-gray-300 dark:hover:bg-gray-500"
-                                        @click="slowMotion">Slow Motion/Time-Lapse</button>
-                                    <button type="button"
-                                        class="bg-gray-200 dark:bg-gray-600 py-1 px-3 rounded m-1 hover:bg-gray-300 dark:hover:bg-gray-500"
-                                        @click="videoEnhancer">AI Video Enhancer</button>
-                                </div>
-                            </div>
-                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                                <h3 class="text-center font-medium mb-2 text-gray-800 dark:text-white">Batch Processing
-                                    <span class="pro-badge">Pro</span></h3>
-                                <div class="flex flex-wrap justify-center">
-                                    <button type="button"
-                                        class="bg-gray-200 dark:bg-gray-600 py-1 px-3 rounded m-1 hover:bg-gray-300 dark:hover:bg-gray-500"
-                                        @click="batchEdit">Mass Editing</button>
-                                    <button type="button"
-                                        class="bg-gray-200 dark:bg-gray-600 py-1 px-3 rounded m-1 hover:bg-gray-300 dark:hover:bg-gray-500"
-                                        @click="aiSuggestions">AI-Driven Suggestions</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Collaborate & Share Section -->
-                <div x-show="tab === 'collaborate'" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-                    <h2 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">Collaborate & Share
-                    </h2>
-                    <div class="space-y-8">
-                        <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
-                            <h3 class="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">Shared Albums</h3>
-                            <p class="text-gray-700 dark:text-gray-300 mb-4">Create collaborative albums and invite
-                                others for real-time editing.</p>
-                            <!-- Placeholder for album creation form -->
-                            <input type="text" placeholder="Album Name"
-                                class="block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 mb-2 p-2">
-                            <input type="email" placeholder="Invite Emails (comma-separated)"
-                                class="block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 mb-2 p-2">
-                            <button class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">Create
-                                Album</button>
-                        </div>
-                        <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
-                            <h3 class="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">Comment & Feedback
-                            </h3>
-                            <p class="text-gray-700 dark:text-gray-300 mb-4">Leave comments and vote on images.</p>
-                            <!-- Placeholder -->
-                            <textarea placeholder="Add Comment"
-                                class="block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 mb-2 p-2 h-24"></textarea>
-                            <div class="flex space-x-2">
-                                <button
-                                    class="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700">Post
-                                    Comment</button>
-                                <button
-                                    class="flex-1 bg-yellow-600 text-white py-2 px-4 rounded-lg hover:bg-yellow-700">Vote</button>
-                            </div>
-                        </div>
-                        <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
-                            <h3 class="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">Share Media</h3>
-                            <p class="text-gray-700 dark:text-gray-300 mb-4">Share to social media or export to cloud.
-                            </p>
-                            <div class="flex flex-wrap justify-center space-x-2">
-                                <button class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 m-1">Share
-                                    to Instagram</button>
-                                <button class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 m-1">Share
-                                    to Facebook</button>
-                                <button class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 m-1">Export
-                                    to Cloud</button>
-                            </div>
-                        </div>
-                        <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
-                            <h3 class="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">Watermark Removal
-                                (Pro) <span class="pro-badge">Pro</span></h3>
-                            <p class="text-gray-700 dark:text-gray-300 mb-4">Remove watermark after purchase.</p>
-                            <button
-                                class="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700">Remove
-                                Watermark</button>
-                        </div>
-                    </div>
-                </div>
-                <!-- Pricing Section -->
-                <div x-show="tab === 'pricing'" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-                    <h2 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">Pricing & Subscription
-                        Options</h2>
+                <!-- Subscription Plans Section -->
+                <div x-show="tab === 'subscriptions'" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+                    <h2 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">Subscription Plans</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div
-                            class="p-6 border rounded-lg shadow bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:shadow-xl transition">
-                            <h3 class="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">Free</h3>
-                            <p class="text-gray-700 dark:text-gray-300">Access to basic editing tools, limited storage,
-                                and watermarked images.</p>
+                        <div class="p-6 border rounded-lg shadow bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:shadow-xl transition">
+                            <h3 class="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">Free Plan</h3>
+                            <p class="text-gray-700 dark:text-gray-300">Basic editing tools, limited storage, and watermarked images.</p>
                             <ul class="mt-4 list-disc pl-6 text-gray-700 dark:text-gray-300">
                                 <li>Basic features</li>
                                 <li>Limited storage</li>
                                 <li>Watermarks</li>
                             </ul>
+                            <button class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 mt-4"
+                                    :disabled="activePlan === 'Free'">Current Plan</button>
                         </div>
-                        <div
-                            class="p-6 border rounded-lg shadow bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:shadow-xl transition">
-                            <h3 class="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">Pro</h3>
-                            <p class="text-gray-700 dark:text-gray-300">Unlock advanced features like AI-powered tools,
-                                background removal, collaboration, and more.</p>
+                        <div class="p-6 border rounded-lg shadow bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:shadow-xl transition">
+                            <h3 class="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">Pro Plan</h3>
+                            <p class="text-gray-700 dark:text-gray-300">Advanced AI tools, unlimited storage, and no watermarks.</p>
                             <ul class="mt-4 list-disc pl-6 text-gray-700 dark:text-gray-300">
                                 <li>Advanced AI tools</li>
                                 <li>Unlimited storage</li>
                                 <li>No watermarks</li>
-                                <li>Collaboration</li>
                             </ul>
-                            <p class="mt-4 font-bold text-gray-800 dark:text-white">Subscription Plans:</p>
-                            <ul class="list-disc pl-6 text-gray-700 dark:text-gray-300">
-                                <li>Monthly ($9.99)</li>
-                                <li>Yearly ($99.99)</li>
-                                <li>Lifetime ($199.99)</li>
-                            </ul>
+                            <form  method="POST">
+                                @csrf
+                                <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 mt-4"
+                                        :disabled="activePlan === 'Pro'">{{ auth()->user()->subscription && auth()->user()->subscription->plan_name === 'Pro' ? 'Current Plan' : 'Upgrade to Pro' }}</button>
+                            </form>
                         </div>
                     </div>
-                </div>
-                <!-- Future Features Section -->
-                <div x-show="tab === 'future'" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-                    <h2 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">Future Feature
-                        Requests</h2>
-                    <ul class="space-y-4 text-gray-700 dark:text-gray-300">
-                        <li class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                            <span class="font-semibold">Augmented Reality Enhancements:</span> More interactive AR
-                            filters for photos and live events.
-                        </li>
-                        <li class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                            <span class="font-semibold">AI-Powered Creative Suite:</span> Advanced tools for graphic
-                            designers and photographers (like object
-                            recognition, intelligent photo composites, and style guides).
-                        </li>
-                    </ul>
                 </div>
             </div>
         </main>
@@ -628,9 +511,6 @@
                             const url = URL.createObjectURL(file);
                             this.previews.push({ url, type: file.type });
                             this.extractExif(file);
-                            if (file.type.startsWith('video/')) {
-                                // Initialize videojs if needed, but since multiple, handle dynamically
-                            }
                         }
                     });
                 },
@@ -699,12 +579,11 @@
         function editData() {
             return {
                 canvas: null,
-                videoPlayer: null,
                 brightness: 0,
                 contrast: 0,
                 init() {
                     const img = new Image();
-                    img.src = 'placeholder-image.jpg'; // Assume a placeholder or from upload
+                    img.src = 'placeholder-image.jpg';
                     img.onload = () => {
                         const canvasEl = document.getElementById('edit-canvas');
                         canvasEl.width = Math.min(img.width, 800);
@@ -717,8 +596,6 @@
                             this.canvas.renderAll();
                         });
                     };
-                    this.videoPlayer = videojs('edit-video');
-                    this.videoPlayer.src('placeholder-video.mp4'); // Assume placeholder
                 },
                 rotate(deg) {
                     const active = this.canvas.getActiveObject();
@@ -727,89 +604,11 @@
                         this.canvas.renderAll();
                     }
                 },
-                applyFilters() {
-                    const active = this.canvas.getActiveObject();
-                    if (active) {
-                        active.filters = [
-                            new fabric.Image.filters.Brightness({ brightness: this.brightness / 100 }),
-                            new fabric.Image.filters.Contrast({ contrast: this.contrast / 100 }),
-                        ];
-                        active.applyFilters();
-                        this.canvas.renderAll();
-                    }
-                },
-                crop() {
-                    alert('Crop tool activated (select area)');
-                },
-                applyFilter() {
-                    alert('Filter applied');
-                },
                 sharpen() {
                     alert('AI Sharpen applied');
                 },
                 colorCorrect() {
                     alert('AI Color Correction applied');
-                },
-                removeBackground() {
-                    alert('AI Background Removed');
-                },
-                skinSmoothing() {
-                    alert('AI Skin Smoothing applied');
-                },
-                addSticker() {
-                    fabric.Image.fromURL('https://example.com/sticker.png', (img) => {
-                        img.scale(0.2);
-                        this.canvas.add(img);
-                        this.canvas.renderAll();
-                    });
-                },
-                addText() {
-                    const text = new fabric.Textbox('Enter Text', { left: 100, top: 100, fontSize: 20 });
-                    this.canvas.add(text);
-                    this.canvas.renderAll();
-                },
-                createGif() {
-                    alert('GIF created from photo');
-                },
-                previewSave() {
-                    alert('Preview saved with watermark');
-                }
-            };
-        }
-        function advancedEditData() {
-            return {
-                backgroundBlur() {
-                    alert('Background Blur applied (Pro)');
-                },
-                virtualBackground() {
-                    alert('Virtual Background applied (Pro)');
-                },
-                neuralStyle() {
-                    alert('Neural Style Transfer applied (Pro)');
-                },
-                skinToneAdjust() {
-                    alert('Skin Tone Adjusted (Pro)');
-                },
-                addLayer() {
-                    alert('New Layer added (Pro)');
-                },
-                masking() {
-                    alert('Masking tool activated (Pro)');
-                },
-                trimVideo() {
-                    alert('Video trimmed (Pro)');
-                },
-                slowMotion() {
-                    alert('Slow Motion applied (Pro)');
-                },
-                videoEnhancer() {
-                    alert('AI Video Enhanced (Pro)');
-                },
-                batchEdit() {
-                    alert('Batch Editing started (Pro)');
-                },
-                aiSuggestions() {
-                    alert('AI Suggestions provided (Pro)');
                 }
             };
         }

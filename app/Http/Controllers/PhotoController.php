@@ -17,6 +17,36 @@ class PhotoController extends Controller
     {
         return response()->json(Photo::all());
     }
+    public function grouped()
+    {
+        $groups = Photo::select('tour_provider', 'location', 'date', 'event')
+            ->groupBy(['tour_provider', 'location', 'date', 'event'])
+            ->get();
+        return view('photos.grouped', compact('groups'));
+    }
+
+    public function share(Photo $photo)
+    {
+        $shareLink = Storage::disk('s3')->temporaryUrl(
+            $photo->watermarked_path ?? $photo->image_path,
+            now()->addMinutes(60)
+        );
+        return view('photos.share', compact('shareLink', 'photo'));
+    }
+
+    public function search(Request $request)
+    {
+        $query = Photo::query();
+        if ($request->keyword) {
+            $query->where('tags', 'like', "%{$request->keyword}%");
+        }
+        if ($request->date_from) {
+            $query->where('date', '>=', $request->date_from);
+        }
+        // Additional filters can be added here, e.g., location, photographer
+        $photos = $query->get();
+        return view('photos.search', compact('photos'));
+    }
 
     /**
      * Store a newly created photo (API).

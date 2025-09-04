@@ -33,15 +33,16 @@ Route::post('/shop/{id}/customize', [ShopController::class, 'storeCustomization'
 
 Route::get('/about', function () {
     return view('about.about');
-});
+})->name('about');
 
 Route::get('/contact', function () {
     return view('contact.contact');
-});
+})->name('contact');
 
 Route::get('/pricing', function () {
     return view('pricing.pricing');
-});
+})->name('pricing');
+;
 
 
 Route::post('photos', [UploadController::class, 'store'])->name('photos.store');

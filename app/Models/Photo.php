@@ -15,9 +15,21 @@ class Photo extends Model
      * @var list<string>
      */
    protected $fillable = [
-        'user_id', 'title', 'description', 'image_path', 'watermarked_path',
-        'price', 'is_featured', 'license_type', 'tags', 'metadata',
-        'tour_provider', 'location', 'event', 'date', 'file_size',
+     'user_id',
+        'title',
+        'description',
+        'image_path',
+        'watermarked_path',
+        'price',
+        'is_featured',
+        'license_type',
+        'tags',
+        'metadata',
+        'tour_provider',
+        'location',
+        'event',
+        'date',
+        'file_size',
     ];
 
     protected $casts = [

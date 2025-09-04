@@ -57,4 +57,25 @@ class User extends Authenticatable
         return $this->belongsTo(Plan::class);
     }
 
+     public function photos()
+    {
+        return $this->hasMany(Photo::class);
+    }
+
+    /**
+     * Accessor for total storage used by the user's photos (in MB, assuming file_size is in MB).
+     */
+    public function getTotalStorageUsedAttribute()
+    {
+        return $this->photos()->sum('file_size');
+    }
+
+    /**
+     * Accessor for unique locations used in the user's photos.
+     */
+    public function getLocationsUsedAttribute()
+    {
+        return $this->photos()->distinct('location')->pluck('location')->filter()->join(', ');
+    }
+
 }

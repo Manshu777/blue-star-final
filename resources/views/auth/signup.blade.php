@@ -39,7 +39,7 @@
                     @endif
 
                     <!-- Register Form -->
-                    <form method="POST" action="{{ route('signup.post') }}" class="space-y-5">
+                    <form method="POST" action="{{ route('signup.post') }}" class="space-y-5" enctype="multipart/form-data">
                         @csrf
 
                         <input type="text" name="name" placeholder="Full Name" value="{{ old('name') }}"
@@ -53,6 +53,21 @@
                         <input type="email" name="email" placeholder="Email Address" value="{{ old('email') }}"
                             class="w-full px-5 py-3 border rounded-full shadow-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                             required>
+
+                        <!-- New: Reference Selfie Upload -->
+                        <div class="space-y-2">
+                            <label for="reference_selfie" class="block text-sm font-medium text-gray-700">
+                                Upload Reference Selfie (Optional)
+                            </label>
+                            <p class="text-xs text-gray-500 mb-2">
+                                Upload a clear photo of your face. This will be used for AI-powered facial recognition to automatically tag you in uploaded photos and videos. (JPEG/PNG, max 2MB)
+                            </p>
+                            <input type="file" name="reference_selfie" id="reference_selfie" accept="image/jpeg,image/png,image/jpg"
+                                class="w-full px-5 py-3 border rounded-full shadow-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            @error('reference_selfie')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
 
                         <div class="relative">
                             <input type="password" name="password" placeholder="Password" id="password"
@@ -110,14 +125,14 @@
                         <a href="{{ route('login') }}" class="text-indigo-600 font-medium hover:underline">Log in</a>
                     </p>
 
-                    <!-- Divider -->
+                    <!-- Divider (commented out as in original) -->
                     <!-- <div class="flex items-center gap-3 my-6">
                             <div class="flex-grow h-px bg-gray-500"></div>
                             <span class="text-gray-500 text-sm">Or sign up with</span>
                             <div class="flex-grow h-px bg-gray-500"></div>
                         </div> -->
 
-                    <!-- Social Login -->
+                    <!-- Social Login (commented out as in original) -->
                     <!-- <div class="space-y-3">
                             <a href="#"
                                 class="w-full flex items-center justify-center gap-2 py-2.5 border rounded-full bg-white shadow-sm hover:bg-gray-50 transition">

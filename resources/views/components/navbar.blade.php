@@ -3,18 +3,18 @@
         <a href="{{ route('home') }}" class="text-xl font-bold">Blue Star Memory</a>
         <div class="space-x-4">
             <a href="{{ route('home') }}" class="hover:text-gray-300">Home</a>
-            <a  class="hover:text-gray-300">About</a>
-            <a class="hover:text-gray-300">Pricing</a>
-            <a class="hover:text-gray-300">Contact</a>
+            <a href="{{ route('about') }}" class="hover:text-gray-300">About</a>
+            <a href="{{ route('pricing') }}"  class="hover:text-gray-300">Pricing</a>
+            <a href="{{ route('contact') }}"  class="hover:text-gray-300">Contact</a>
             @auth
-                <a  class="hover:text-gray-300">Dashboard</a>
+                <a href="{{ route('upload') }}" class="hover:text-gray-300">Dashboard</a>
                 <form  method="POST" class="inline">
                     @csrf
                     <button type="submit" class="hover:text-gray-300">Logout</button>
                 </form>
             @else
-                <a class="hover:text-gray-300">Login</a>
-                <a   class="hover:text-gray-300">Register</a>
+                <a href="{{ route('login') }}" class="hover:text-gray-300">Login</a>
+                <a href="{{ route('signup') }}"  class="hover:text-gray-300">Sign In</a>
             @endauth
         </div>
     </div>
