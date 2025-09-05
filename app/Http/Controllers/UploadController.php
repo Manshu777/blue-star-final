@@ -359,68 +359,136 @@ class UploadController extends Controller
         return response()->json($photo);
     }
 
-    /**
-     * Update the specified photo (API).
-     */
-    public function update(Request $request, Photo $photo)
+    public function update(Request $request, $id)
     {
         try {
+            $user = Auth::user();
+            $photo = Photo::where('user_id', $user->id)->findOrFail($id);
+
+            // Validate request
             $validated = $request->validate([
-                'title'        => 'required|string|max:255',
-                'description'  => 'nullable|string|max:1000',
-                'price'        => 'nullable|numeric|min:0',
-                'license_type' => 'nullable|string|in:personal,commercial',
-                'is_featured'  => 'boolean',
-                'tags'         => 'nullable|string|max:500',
-                'file'         => 'nullable|file|mimes:jpg,jpeg,png,mp4,mov|max:20480',
+                'title' => 'required|string|max:255',
+                'description' => 'nullable|string|max:1000',
+                'tags' => 'nullable|string|max:500',
+                'tour_provider' => 'nullable|string|max:255',
+                'location' => 'nullable|string|max:255',
+                'folder_name' => 'nullable|string|max:255', // Maps to event
+                'is_featured' => 'nullable|boolean',
             ]);
 
-            if ($request->hasFile('file')) {
-                Storage::disk('s3')->delete($photo->image_path);
+            // Update photo metadata
+            $photo->update([
+                'title' => $validated['title'],
+                'description' => $validated['description'],
+                'tags' => $validated['tags'] ? trim($validated['tags'], ',') : $photo->tags,
+                'tour_provider' => $validated['tour_provider'] ?? $photo->tour_provider,
+                'location' => $validated['location'] ?? $photo->location,
+                'event' => $validated['folder_name'] ?? $photo->event,
+                'is_featured' => $validated['is_featured'] ?? $photo->is_featured,
+            ]);
 
-                $file                    = $request->file('file');
-                $path                    = $file->storeAs('media', time() . '_' . $file->getClientOriginalName(), 's3');
-                $validated['image_path'] = $path;
+            // Optionally re-run AWS Rekognition Auto Tagging if tags are updated
+            if ($request->filled('tags') && $photo->public_id) {
+                try {
+                    $fileContents = Storage::disk('s3')->get($photo->public_id);
+                    $rekognitionResult = $this->rekognition->detectLabels([
+                        'Image' => [
+                            'Bytes' => $fileContents,
+                        ],
+                        'MaxLabels' => 10,
+                        'MinConfidence' => 70,
+                    ]);
 
-                $metadata = [];
-                if (in_array($file->getMimeType(), ['image/jpeg', 'image/png'])) {
-                    if (function_exists('\exif_read_data')) {
-                        $exif = @\exif_read_data($file->getRealPath());
-                        if ($exif) {
-                            $metadata['date']     = $exif['DateTimeOriginal'] ?? null;
-                            $metadata['location'] = $exif['GPSLatitude'] ?? null;
-                        }
-                    }
+                    $autoTags = array_map(function ($label) {
+                        return $label['Name'];
+                    }, $rekognitionResult->get('Labels') ?? []);
+                    $existingTags = $validated['tags'] ? explode(',', trim($validated['tags'], ',')) : [];
+                    $photo->tags = implode(',', array_unique(array_merge($existingTags, $autoTags)));
+                    $photo->save();
+                } catch (\Aws\Exception\AwsException $e) {
+                    Log::error('Rekognition update error', [
+                        'user_id' => $user->id,
+                        'photo_id' => $photo->id,
+                        'message' => $e->getMessage(),
+                    ]);
                 }
-                $validated['metadata'] = json_encode($metadata);
             }
 
-            $autoTags          = 'face_detected,location_based';
-            $tags              = $validated['tags'] ? $validated['tags'] . ',' . $autoTags : $autoTags;
-            $validated['tags'] = $tags;
+            Log::info('Photo updated successfully', [
+                'user_id' => $user->id,
+                'photo_id' => $photo->id,
+            ]);
 
-            $photo->update($validated);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'photo' => $photo,
+                    'url' => $photo->image_path,
+                ], 200);
+            }
 
-            return response()->json(['success' => true, 'photo' => $photo]);
-
+            return redirect()->route('photos.store')->with('success', 'Photo updated successfully.');
         } catch (ValidationException $e) {
-            return response()->json(['errors' => $e->errors()], 422);
+            Log::error('Validation failed', ['errors' => $e->errors(), 'user_id' => Auth::id()]);
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'errors' => $e->errors()], 422);
+            }
+            return redirect()->back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred during update: ' . $e->getMessage()], 500);
+            Log::error('Update error', [
+                'user_id' => Auth::id(),
+                'photo_id' => $id,
+                'message' => $e->getMessage(),
+            ]);
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Update failed: ' . $e->getMessage()], 500);
+            }
+            return redirect()->back()->with('error', 'Update failed: ' . $e->getMessage())->withInput();
         }
     }
 
-    /**
-     * Remove the specified photo (API).
-     */
-    public function destroy(Photo $photo)
+    public function destroy(Request $request, $id)
     {
         try {
-            Storage::disk('s3')->delete($photo->image_path);
+            $user = Auth::user();
+            $photo = Photo::where('user_id', $user->id)->findOrFail($id);
+
+            // Delete from AWS S3
+            if ($photo->public_id) {
+                try {
+                    Storage::disk('s3')->delete($photo->public_id);
+                } catch (\Exception $e) {
+                    Log::error('S3 deletion error', [
+                        'user_id' => $user->id,
+                        'photo_id' => $photo->id,
+                        'message' => $e->getMessage(),
+                    ]);
+                }
+            }
+
+            // Delete from database
             $photo->delete();
-            return response()->json(['success' => true], 204);
+
+            Log::info('Photo deleted successfully', [
+                'user_id' => $user->id,
+                'photo_id' => $id,
+            ]);
+
+            if ($request->expectsJson()) {
+                return response()->json(['success' => true, 'message' => 'Photo deleted successfully.'], 200);
+            }
+
+            return redirect()->route('photos.store')->with('success', 'Photo deleted successfully.');
         } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred during deletion: ' . $e->getMessage()], 500);
+            Log::error('Delete error', [
+                'user_id' => Auth::id(),
+                'photo_id' => $id,
+                'message' => $e->getMessage(),
+            ]);
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Delete failed: ' . $e->getMessage()], 500);
+            }
+            return redirect()->back()->with('error', 'Delete failed: ' . $e->getMessage());
         }
     }
 }

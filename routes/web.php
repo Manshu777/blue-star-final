@@ -54,7 +54,9 @@ Route::delete('photos/{photo}', [UploadController::class, 'destroy'])->name('pho
 
 
 
-
+Route::post('/photos/search', [UploadController::class, 'search'])->name('photos.search');
+Route::put('/photos/{id}', [UploadController::class, 'update'])->name('photos.update');
+Route::delete('/photos/{id}', [UploadController::class, 'destroy'])->name('photos.destroy');
 
 
 Route::get('/dashboard', [ProfileController::class, 'index'])->name('user.dashboard');
@@ -79,7 +81,7 @@ Route::get('/photos/share/preview/{id}', [SocialShareController::class, 'preview
 
 Route::get('/upload', [S3FileUploadController::class, 'showForm'])->name('upload.form');
 Route::post('/upload', [S3FileUploadController::class, 'upload'])->name('upload');
+Route::get('/photos', [S3FileUploadController::class, 'index'])->name('photos.index');
 
-
-
+//search
 require __DIR__ . '/auth.php';

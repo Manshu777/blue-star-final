@@ -5,14 +5,53 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Models\Photo;
+
+
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Aws\Exception\AwsException;
 
 class S3FileUploadController extends Controller
 {
     public function showForm()
     {
-        return view('upload-form');
+       $photos = Photo::latest()->get()->groupBy('event')->toArray();
+
+    // Format photos
+    $photos = array_map(function ($eventPhotos) {
+        return array_map(function ($photo) {
+            return [
+                'url' => Storage::disk('s3')->url($photo['image_path']),
+                'title' => $photo['title'],
+              'id' => $photo['id'],
+                'location' => $photo['location'] ?? 'No Location',
+                'tags' => $photo['tags'] ? explode(',', $photo['tags']) : [],
+                'date' => $photo['date'] ? \Carbon\Carbon::parse($photo['date'])->diffForHumans() : '',
+            ];
+        }, $eventPhotos);
+    }, $photos);
+
+    // Get 10 most recent uploads
+    $recentUploads = Photo::latest()->take(10)->get()->map(function ($photo) {
+        return [
+            'url' => Storage::disk('s3')->url($photo->image_path),
+            'title' => $photo->title,
+           'id' => $photo['id'],
+            'location' => $photo->location ?? 'No Location',
+            'tags' => $photo->tags ? explode(',', $photo->tags) : [],
+            'date' => $photo->date ? \Carbon\Carbon::parse($photo->date)->diffForHumans() : '',
+        ];
+    });
+
+    return view('upload-form', compact('photos', 'recentUploads'));
     }
+
+   public function index(Request $request)
+{
+   
+}
+    
 
     public function upload(Request $request)
     {
