@@ -24,7 +24,12 @@ class User extends Authenticatable
         'email',
         'password',
         'plan_id',
-        'reference_selfie_path'
+        'reference_selfie_path',
+        'otp',
+        'temp_selfie_path',
+
+        'status',
+
     ];
 
     /**

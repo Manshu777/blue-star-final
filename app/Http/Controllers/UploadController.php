@@ -6,6 +6,7 @@ use App\Models\Photo;
 use Aws\Rekognition\RekognitionClient;
 use Aws\S3\S3Client;
 use Carbon\Carbon;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -359,94 +360,103 @@ class UploadController extends Controller
         return response()->json($photo);
     }
 
-    public function update(Request $request, $id)
-    {
-        try {
-            $user = Auth::user();
-            $photo = Photo::where('user_id', $user->id)->findOrFail($id);
 
-            // Validate request
-            $validated = $request->validate([
-                'title' => 'required|string|max:255',
-                'description' => 'nullable|string|max:1000',
-                'tags' => 'nullable|string|max:500',
-                'tour_provider' => 'nullable|string|max:255',
-                'location' => 'nullable|string|max:255',
-                'folder_name' => 'nullable|string|max:255', // Maps to event
-                'is_featured' => 'nullable|boolean',
-            ]);
+         public function analyzeImage(Request $request)
+{
+    try {
+        // Validate the incoming request
+        $request->validate([
+            'image' => 'required|file|image|mimes:jpeg,png|max:15360',
+        ]);
 
-            // Update photo metadata
-            $photo->update([
-                'title' => $validated['title'],
-                'description' => $validated['description'],
-                'tags' => $validated['tags'] ? trim($validated['tags'], ',') : $photo->tags,
-                'tour_provider' => $validated['tour_provider'] ?? $photo->tour_provider,
-                'location' => $validated['location'] ?? $photo->location,
-                'event' => $validated['folder_name'] ?? $photo->event,
-                'is_featured' => $validated['is_featured'] ?? $photo->is_featured,
-            ]);
-
-            // Optionally re-run AWS Rekognition Auto Tagging if tags are updated
-            if ($request->filled('tags') && $photo->public_id) {
-                try {
-                    $fileContents = Storage::disk('s3')->get($photo->public_id);
-                    $rekognitionResult = $this->rekognition->detectLabels([
-                        'Image' => [
-                            'Bytes' => $fileContents,
-                        ],
-                        'MaxLabels' => 10,
-                        'MinConfidence' => 70,
-                    ]);
-
-                    $autoTags = array_map(function ($label) {
-                        return $label['Name'];
-                    }, $rekognitionResult->get('Labels') ?? []);
-                    $existingTags = $validated['tags'] ? explode(',', trim($validated['tags'], ',')) : [];
-                    $photo->tags = implode(',', array_unique(array_merge($existingTags, $autoTags)));
-                    $photo->save();
-                } catch (\Aws\Exception\AwsException $e) {
-                    Log::error('Rekognition update error', [
-                        'user_id' => $user->id,
-                        'photo_id' => $photo->id,
-                        'message' => $e->getMessage(),
-                    ]);
-                }
-            }
-
-            Log::info('Photo updated successfully', [
-                'user_id' => $user->id,
-                'photo_id' => $photo->id,
-            ]);
-
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => true,
-                    'photo' => $photo,
-                    'url' => $photo->image_path,
-                ], 200);
-            }
-
-            return redirect()->route('photos.store')->with('success', 'Photo updated successfully.');
-        } catch (ValidationException $e) {
-            Log::error('Validation failed', ['errors' => $e->errors(), 'user_id' => Auth::id()]);
-            if ($request->expectsJson()) {
-                return response()->json(['success' => false, 'errors' => $e->errors()], 422);
-            }
-            return redirect()->back()->withErrors($e->errors())->withInput();
-        } catch (\Exception $e) {
-            Log::error('Update error', [
-                'user_id' => Auth::id(),
-                'photo_id' => $id,
-                'message' => $e->getMessage(),
-            ]);
-            if ($request->expectsJson()) {
-                return response()->json(['success' => false, 'message' => 'Update failed: ' . $e->getMessage()], 500);
-            }
-            return redirect()->back()->with('error', 'Update failed: ' . $e->getMessage())->withInput();
+        // Check if file was uploaded successfully
+        if (!$request->hasFile('image') || !$request->file('image')->isValid()) {
+            throw new \Exception('Invalid image file upload');
         }
-    }
 
+        $imageFile = $request->file('image');
+        
+        // Verify file size before processing
+        if ($imageFile->getSize() > 15360 * 1024) { // Convert KB to bytes
+            throw new \Exception('Image file size exceeds maximum limit');
+        }
+
+        // Read image file
+        $imageBytes = @file_get_contents($imageFile->getRealPath());
+        if ($imageBytes === false) {
+            throw new \Exception('Failed to read image file');
+        }
+
+        // Initialize AWS Rekognition client
+        $rekognition = new RekognitionClient([
+            'version' => 'latest',
+            'region' => env('AWS_DEFAULT_REGION'),
+            'credentials' => [
+                'key' => env('AWS_ACCESS_KEY_ID'),
+                'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            ],
+        ]);
+
+        // Verify AWS credentials
+        if (empty(env('AWS_ACCESS_KEY_ID')) || empty(env('AWS_SECRET_ACCESS_KEY'))) {
+            throw new \Exception('AWS credentials not configured');
+        }
+
+        // Perform image analysis
+        $result = $rekognition->detectLabels([
+            'Image' => ['Bytes' => $imageBytes],
+            'MaxLabels' => 10,
+            'MinConfidence' => 80,
+        ]);
+
+        // Process results
+        $tags = collect($result['Labels'])->pluck('Name')->toArray();
+        
+        if (empty($tags)) {
+            return response()->json([
+                'success' => true,
+                'tags' => '',
+                'message' => 'No labels detected with sufficient confidence'
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'tags' => implode(', ', $tags),
+        ]);
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        Log::error('Validation error: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'Invalid input: ' . $e->getMessage(),
+            'errors' => $e->errors()
+        ], 422);
+    } catch (\Aws\Exception\CredentialsException $e) {
+        Log::error('AWS credentials error: ' . $e->getAwsErrorMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'AWS credentials invalid'
+        ], 500);
+    } catch (\Aws\Exception\AwsException $e) {
+        Log::error('Rekognition error: ' . $e->getAwsErrorMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'AWS analysis failed: ' . $e->getAwsErrorMessage()
+        ], 500);
+    } catch (\Exception $e) {
+        Log::error('General analysis error: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'Analysis failed: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+
+
+
+   
     public function destroy(Request $request, $id)
     {
         try {
