@@ -13,6 +13,9 @@ use App\Http\Controllers\AuthController;
 Route::get('/signup', [AuthController::class, 'showSignupForm'])->name('signup');
 Route::post('/signup', [AuthController::class, 'signup'])->name('signup.post');
 
+Route::post('/verify-otp', [AuthController::class, 'verifyOtp'])->name('verify.otp');
+Route::post('/resend-otp', [AuthController::class, 'resendOtp'])->name('resend.otp');
+
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 
@@ -48,16 +51,17 @@ Route::get('/pricing', function () {
 Route::post('photos', [UploadController::class, 'store'])->name('photos.store');
 Route::get('photos', [UploadController::class, 'index'])->name('photos.index');
 Route::get('photos/{photo}', [UploadController::class, 'show'])->name('photos.show');
-Route::post('photos/{photo}', [UploadController::class, 'update'])->name('photos.update');
+// Route::post('photos/{photo}', [UploadController::class, 'update'])->name('photos.update');
 Route::delete('photos/{photo}', [UploadController::class, 'destroy'])->name('photos.destroy');
 
+Route::post('/photos/analyze', [UploadController::class, 'analyzeImage']);
 
 
 
 Route::post('/photos/search', [UploadController::class, 'search'])->name('photos.search');
 Route::put('/photos/{id}', [UploadController::class, 'update'])->name('photos.update');
 Route::delete('/photos/{id}', [UploadController::class, 'destroy'])->name('photos.destroy');
-
+Route::post('/photos/analyze', [UploadController::class, 'analyzeImage'])->name('photos.analyze');
 
 Route::get('/dashboard', [ProfileController::class, 'index'])->name('user.dashboard');
 

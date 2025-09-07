@@ -40,7 +40,7 @@
                     <form method="POST" action="/login" class="space-y-5">
                         @csrf
 
-                        <input type="text" name="login" placeholder="Email or Username" value="{{ old('login') }}"
+                        <input type="text" name="email" placeholder="Email or Username" value="{{ old('email') }}"
                             class="w-full px-5 py-3 border rounded-full shadow-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                             required>
 
