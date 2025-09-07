@@ -24,6 +24,7 @@
 
         <div class="hidden lg:flex items-center space-x-4">
             <a href="{{ route('home') }}" class="hover:text-gray-400 text-gray-600">Home</a>
+            <a href="/shop" class="hover:text-gray-400 text-gray-600">Shop</a>
             <a href="{{ route('about') }}" class="hover:text-gray-400 text-gray-600">About</a>
             <a href="{{ route('pricing') }}" class="hover:text-gray-400 text-gray-600">Pricing</a>
             <a href="{{ route('contact') }}" class="hover:text-gray-400 text-gray-600">Contact</a>
