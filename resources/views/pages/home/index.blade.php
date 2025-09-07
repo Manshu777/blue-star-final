@@ -4,47 +4,65 @@
 
 @section('content')
     <section class="relative">
-        <div class="bg-gradient-to-br from-blue-600 via-blue-500 to-blue-400 text-white py-20 mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="max-w-7xl text-left mx-auto">
-                <h1 class="text-4xl md:text-6xl font-bold mb-8">
-                    Find and Relive Your<br />
-                    <span class="text-blue-100">Memories Instantly</span>
+        <!-- Hero Section -->
+        <div class="relative bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-600 text-white overflow-hidden">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8 py-24 relative z-10">
+                <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-6">
+                    Find and Relive Your <br />
+                    <span class="bg-gradient-to-r from-blue-200 to-teal-200 bg-clip-text text-transparent">
+                        Memories Instantly
+                    </span>
                 </h1>
+                <p class="text-lg md:text-xl text-blue-100 max-w-2xl mb-10">
+                    Organize, search, and experience your photos with AI-powered face recognition, AR filters, and secure
+                    cloud storage.
+                </p>
 
-                <div class="max-w-8xl mx-auto bg-white rounded-2xl shadow-2xl p-4 flex flex-col md:flex-row gap-4">
-                    <div class="flex-1 relative">
+                <!-- Upload + Search Box -->
+                <div class="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl p-6 flex flex-col md:flex-row gap-4">
+                    <!-- Upload -->
+                    <div class="flex-1">
                         <a
-                            class="flex items-center bg-gray-50 rounded-xl px-4 py-3 cursor-pointer hover:bg-gray-100 transition-colors duration-200">
-                            <svg class="h-5 w-5 text-gray-400 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            class="flex items-center bg-gray-50 rounded-xl px-5 py-4 cursor-pointer hover:bg-gray-100 transition">
+                            <svg class="h-6 w-6 text-blue-500 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                             </svg>
-                            <span class="text-gray-600 font-medium">Upload Selfie to Find Your Memories</span>
+                            <span class="text-gray-700 font-medium">Upload Selfie to Find Your Memories</span>
                         </a>
                     </div>
 
-                    <div class="flex-1 relative">
-                        <form method="GET" class="flex items-center bg-gray-50 rounded-xl">
-                            <svg class="h-5 w-5 text-gray-400 ml-4" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    <!-- Search -->
+                    <div class="flex-1">
+                        <form method="GET" class="flex items-center bg-gray-50 rounded-xl px-4 py-3 shadow-inner">
+                            <svg class="h-6 w-6 text-blue-500 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
-                            <input type="text" name="query" placeholder="Search by Date/Location"
-                                class="w-full px-4 py-3 bg-transparent text-gray-700 placeholder-gray-500 focus:outline-none" />
+                            <input type="text" name="query" placeholder="Search by Date / Location"
+                                class="w-full bg-transparent text-gray-700 placeholder-gray-500 focus:outline-none" />
                         </form>
                     </div>
                 </div>
             </div>
+
+            <!-- Decorative Background Glow -->
+            <div class="absolute inset-0 bg-gradient-to-tr from-indigo-700 via-blue-600 to-purple-600 opacity-70"></div>
         </div>
 
-        <section class="py-8 lg:py-16 w-full absolute top-[283px] left-0 ">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div class="text-center group hover:transform hover:scale-105 transition-all duration-300">
+
+        <!-- Features Section -->
+        <section class="relative py-20 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+
+                    <!-- Feature Card -->
+                    <div
+                        class="text-center bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
                         <div
-                            class="bg-blue-50 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-300">
+                            class="bg-gradient-to-br from-blue-100 to-blue-50 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center shadow-inner">
                             <svg class="h-10 w-10 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -52,12 +70,14 @@
                             </svg>
                         </div>
                         <h3 class="text-lg font-semibold text-gray-900 mb-2">Face Detection</h3>
-                        <p class="text-gray-600 text-sm leading-relaxed">Advanced AI technology to identify faces in photos
-                        </p>
+                        <p class="text-gray-600 text-sm">Advanced AI technology to identify faces in photos.</p>
                     </div>
-                    <div class="text-center group hover:transform hover:scale-105 transition-all duration-300">
+
+                    <!-- Feature Card -->
+                    <div
+                        class="text-center bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
                         <div
-                            class="bg-blue-50 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-300">
+                            class="bg-gradient-to-br from-blue-100 to-blue-50 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center shadow-inner">
                             <svg class="h-10 w-10 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -65,12 +85,14 @@
                             </svg>
                         </div>
                         <h3 class="text-lg font-semibold text-gray-900 mb-2">Photo Grouping</h3>
-                        <p class="text-gray-600 text-sm leading-relaxed">Automatically organize photos by events and people
-                        </p>
+                        <p class="text-gray-600 text-sm">Automatically organize photos by events and people.</p>
                     </div>
-                    <div class="text-center group hover:transform hover:scale-105 transition-all duration-300">
+
+                    <!-- Feature Card -->
+                    <div
+                        class="text-center bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
                         <div
-                            class="bg-blue-50 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-300">
+                            class="bg-gradient-to-br from-blue-100 to-blue-50 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center shadow-inner">
                             <svg class="h-10 w-10 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -78,11 +100,14 @@
                             </svg>
                         </div>
                         <h3 class="text-lg font-semibold text-gray-900 mb-2">AR Filters</h3>
-                        <p class="text-gray-600 text-sm leading-relaxed">Enhance your memories with augmented reality</p>
+                        <p class="text-gray-600 text-sm">Enhance your memories with immersive augmented reality filters.</p>
                     </div>
-                    <div class="text-center group hover:transform hover:scale-105 transition-all duration-300">
+
+                    <!-- Feature Card -->
+                    <div
+                        class="text-center bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
                         <div
-                            class="bg-blue-50 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow duration-300">
+                            class="bg-gradient-to-br from-blue-100 to-blue-50 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center shadow-inner">
                             <svg class="h-10 w-10 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -90,12 +115,12 @@
                             </svg>
                         </div>
                         <h3 class="text-lg font-semibold text-gray-900 mb-2">Secure Cloud</h3>
-                        <p class="text-gray-600 text-sm leading-relaxed">Your memories are safe with enterprise-grade
-                            security</p>
+                        <p class="text-gray-600 text-sm">Your memories are safe with enterprise-grade security.</p>
                     </div>
                 </div>
             </div>
         </section>
+
 
         @include('components.how-it-works')
         @include('components.revolutionary')

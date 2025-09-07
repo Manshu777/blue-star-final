@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,29 +8,34 @@
     <title>@yield('title', 'Create Next App')</title>
     <!-- Tailwind CSS -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://kit.fontawesome.com/610f7e8110.js" crossorigin="anonymous"></script>
     <!-- Geist Fonts via Google Fonts or Vercel CDN -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Sans:wght@400;500;700&family=Geist+Mono:wght@400;500;700&display=swap">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Geist+Sans:wght@400;500;700&family=Geist+Mono:wght@400;500;700&display=swap">
     <style>
         :root {
             --font-geist-sans: 'Geist Sans', sans-serif;
             --font-geist-mono: 'Geist Mono', monospace;
         }
+
         body {
             font-family: var(--font-geist-sans);
         }
+
         .font-mono {
             font-family: var(--font-geist-mono);
         }
     </style>
-     
+
 
 </head>
+
 <body class="antialiased">
     @include('components.navbar')
     @yield('content')
     @include('components.footer')
-     @stack('scripts')
+    @stack('scripts')
 </body>
+
 </html>

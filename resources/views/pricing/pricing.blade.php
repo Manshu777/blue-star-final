@@ -271,7 +271,7 @@
                     Join thousands of users who have transformed their photo management experience with Blue Star
                     Memory.
                 </p>
-                <a href="/get-started"
+                <a href="/"
                     class="inline-flex items-center bg-white text-indigo-600 font-semibold px-12 py-5 rounded-full hover:bg-gray-100 transition-all duration-300 shadow-lg hover:shadow-xl text-lg">
                     <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg">

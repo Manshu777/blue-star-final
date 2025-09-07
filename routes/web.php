@@ -1,6 +1,10 @@
 <?php
 
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PlanController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
@@ -27,6 +31,21 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 use App\Http\Controllers\ShopController;
 
+
+Route::get('/shop', [ProductController::class, 'index'])->name('shop.index');
+Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add/{productId}', [CartController::class, 'add'])->name('cart.add');
+    Route::patch('/cart/update/{itemId}', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/remove/{itemId}', [CartController::class, 'remove'])->name('cart.remove');
+
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+
+    Route::get('/orders/{orderId}/complete', [OrderController::class, 'complete'])->name('orders.complete');
+});
 
 
 Route::get('/', [HomeController::class, 'index'])->name('home');

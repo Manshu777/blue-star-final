@@ -2,16 +2,14 @@
     <div class="mx-auto max-w-7xl px-6">
         <!-- Section Header -->
         <div class="pb-16 text-center">
-            <span
-                class="inline-flex items-center px-5 py-2 rounded-full bg-indigo-100 text-indigo-800 text-sm font-semibold mb-4 shadow-sm">
+            <span class="inline-flex items-center px-5 py-2 rounded-full bg-indigo-100 text-indigo-800 text-sm font-semibold mb-4 shadow-sm">
                 📸 Memories in Motion
             </span>
             <h2 class="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-4">
                 Our Gallery
             </h2>
             <p class="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-                Explore the beauty, creativity, and special moments captured in our curated collection of images &
-                videos.
+                Explore the beauty, creativity, and special moments captured in our curated collection of images & videos.
             </p>
         </div>
 
@@ -21,15 +19,22 @@
                 <div class="swiper-wrapper">
                     @foreach ($mediaItems as $item)
                         <div class="swiper-slide">
-                            <div
-                                class="rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 group bg-white">
+                            <div class="rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 group bg-white">
                                 @if ($item->type === 'video')
-                                    <video src="{{ asset('storage/' . $item->file_path) }}" autoplay loop muted playsinline
-                                        class="w-full h-[350px] object-cover group-hover:scale-105 transition-transform duration-500"></video>
+                                    <video
+                                        src="{{ asset('storage/' . $item->file_path) }}"
+                                        autoplay
+                                        loop
+                                        muted
+                                        playsinline
+                                        class="w-full h-[350px] object-cover group-hover:scale-105 transition-transform duration-500"
+                                    ></video>
                                 @else
-                                    <img src="{{ asset('storage/' . $item->file_path) }}"
+                                    <img
+                                        src="{{ asset('storage/' . $item->file_path) }}"
                                         alt="{{ $item->title ?? 'Gallery Item' }}"
-                                        class="w-full h-[350px] object-cover group-hover:scale-105 transition-transform duration-500" />
+                                        class="w-full h-[350px] object-cover group-hover:scale-105 transition-transform duration-500"
+                                    />
                                 @endif
                                 <div class="p-5 text-center">
                                     <h3 class="text-xl font-semibold text-gray-900">{{ $item->title ?? 'Untitled' }}</h3>
