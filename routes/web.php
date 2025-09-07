@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
@@ -7,6 +8,9 @@ use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\S3FileUploadController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\AuthController;
+
+
+
 
 
 
@@ -24,6 +28,8 @@ use App\Http\Controllers\ShopController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+
+
 // Route::view('/login', 'auth.login')->name('login');
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/shop/{id}/customize', [ShopController::class, 'customize'])->name('shop.customize');
@@ -39,10 +45,7 @@ Route::get('/contact', function () {
     return view('contact.contact');
 })->name('contact');
 
-Route::get('/pricing', function () {
-    return view('pricing.pricing');
-})->name('pricing');
-;
+Route::get('/pricing', [PlanController::class, 'index'])->name('pricing');
 
 
 Route::post('photos', [UploadController::class, 'store'])->name('photos.store');

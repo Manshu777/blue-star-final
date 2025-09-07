@@ -4,13 +4,13 @@
 
 @section('content')
     <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-        <!-- Hero Section - Enhanced with smoother gradients and refined typography -->
-        <section class="py-20 lg:py-32">
+
+        <!-- <section class="py-20 lg:py-32">
             <div class="container mx-auto px-4">
                 <div class="text-center max-w-4xl mx-auto">
                     <span
                         class="mb-6 inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0 px-4 py-2 rounded-full text-sm font-medium">
-                        <i class="fas fa-heart mr-2"></i> <!-- Using Font Awesome for icons, assume included -->
+                        <i class="fas fa-heart mr-2"></i> 
                         Get in Touch
                     </span>
                     <h1 class="text-5xl lg:text-6xl font-bold text-gray-900 mb-6 tracking-tight">
@@ -43,7 +43,7 @@
                     </div>
                 </div>
             </div>
-        </section>
+        </section> -->
 
         <!-- Contact Methods - Improved with subtle animations and cleaner cards -->
         <section class="py-20 bg-white">
@@ -294,8 +294,8 @@
             </div>
         </section>
 
-        <!-- Development Investment - Improved with elegant pricing display and icons -->
-        <section class="py-20 bg-white">
+       
+        <!-- <section class="py-20 bg-white">
             <div class="container mx-auto px-4">
                 <div class="text-center mb-16">
                     <span
@@ -396,9 +396,8 @@
                     </div>
                 </div>
             </div>
-        </section>
+        </section> -->
 
-        <!-- CTA Section - Made more elegant with refined gradients and button styles -->
         <section class="py-20 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
             <div class="container mx-auto px-4 text-center">
                 <div class="max-w-4xl mx-auto">

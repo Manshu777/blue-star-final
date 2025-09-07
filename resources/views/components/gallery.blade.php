@@ -1,91 +1,49 @@
-<section class="py-12">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 overflow-hidden">
-        <div class="pb-16">
-            <h2 class="w-full text-center text-gray-900 text-4xl font-bold leading-loose pb-2.5">
+<section class="py-20 bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+    <div class="mx-auto max-w-7xl px-6">
+        <!-- Section Header -->
+        <div class="pb-16 text-center">
+            <span
+                class="inline-flex items-center px-5 py-2 rounded-full bg-indigo-100 text-indigo-800 text-sm font-semibold mb-4 shadow-sm">
+                📸 Memories in Motion
+            </span>
+            <h2 class="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-4">
                 Our Gallery
             </h2>
-            <p class="w-full text-center text-gray-600 text-lg font-normal leading-8">
-                Explore the essence of beauty in our gallery&apos;s intimate space.
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+                Explore the beauty, creativity, and special moments captured in our curated collection of images &
+                videos.
             </p>
         </div>
-        <div class="mx-auto w-auto relative">
-            <div class="swiper gallery-top pt-6" id="gallery-swiper">
-                <div class="swiper-wrapper">
-                    @php
-                        $mediaItems = [
-                            [
-                                'type' => 'image',
-                                'src' => asset('gallery/img-1.jpeg'),
-                                'title' => 'Image 1',
-                                'description' => 'A captivating moment captured in time.',
-                            ],
-                            [
-                                'type' => 'image',
-                                'src' => asset('gallery/img-2.jpeg'),
-                                'title' => 'Image 2',
-                                'description' => 'A vibrant scene full of energy.',
-                            ],
-                            [
-                                'type' => 'image',
-                                'src' => asset('gallery/img-3.jpeg'),
-                                'title' => 'Image 3',
-                                'description' => 'A serene and elegant composition.',
-                            ],
-                            [
-                                'type' => 'image',
-                                'src' => asset('gallery/img-4.jpeg'),
-                                'title' => 'Image 4',
-                                'description' => 'A bold and striking visual.',
-                            ],
-                            [
-                                'type' => 'image',
-                                'src' => asset('gallery/img-5.jpeg'),
-                                'title' => 'Image 5',
-                                'description' => 'A timeless snapshot of beauty.',
-                            ],
-                            [
-                                'type' => 'video',
-                                'src' => asset('gallery/vid-1.mp4'),
-                                'title' => 'Video 1',
-                                'description' => 'A dynamic video showcasing motion.',
-                            ],
-                            [
-                                'type' => 'video',
-                                'src' => asset('gallery/vid-2.mp4'),
-                                'title' => 'Video 2',
-                                'description' => 'An engaging clip with vivid details.',
-                            ],
-                        ];
-                    @endphp
 
-                    @foreach ($mediaItems as $index => $item)
-                        <div class="swiper-slide grid">
-                            @if ($item['type'] === 'video')
-                                <video
-                                    src="{{ $item['src'] }}"
-                                    autoplay
-                                    loop
-                                    muted
-                                    playsinline
-                                    class="w-full h-[400px] rounded-xl object-cover mx-auto"
-                                ></video>
-                            @else
-                                <a >
-                                    <img
-                                        src="{{ $item['src'] }}"
-                                        alt="{{ $item['title'] }}"
-                                        class="w-full h-[400px] rounded-xl object-cover mx-auto"
-                                    />
-                                </a>
-                            @endif
-                            <div class="mt-4 text-center">
-                                <h3 class="text-lg font-semibold text-gray-900">{{ $item['title'] }}</h3>
-                                <p class="text-gray-600 text-sm">{{ $item['description'] }}</p>
+        <!-- Swiper Container -->
+        <div class="relative">
+            <div class="swiper gallery-swiper" id="gallery-swiper">
+                <div class="swiper-wrapper">
+                    @foreach ($mediaItems as $item)
+                        <div class="swiper-slide">
+                            <div
+                                class="rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 group bg-white">
+                                @if ($item->type === 'video')
+                                    <video src="{{ asset('storage/' . $item->file_path) }}" autoplay loop muted playsinline
+                                        class="w-full h-[350px] object-cover group-hover:scale-105 transition-transform duration-500"></video>
+                                @else
+                                    <img src="{{ asset('storage/' . $item->file_path) }}"
+                                        alt="{{ $item->title ?? 'Gallery Item' }}"
+                                        class="w-full h-[350px] object-cover group-hover:scale-105 transition-transform duration-500" />
+                                @endif
+                                <div class="p-5 text-center">
+                                    <h3 class="text-xl font-semibold text-gray-900">{{ $item->title ?? 'Untitled' }}</h3>
+                                    <p class="text-gray-500 text-sm mt-1">
+                                        {{ $item->created_at->format('M d, Y') }}
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     @endforeach
                 </div>
-                <div class="swiper-pagination mt-4"></div>
+
+                <!-- Controls -->
+                <div class="swiper-pagination mt-6"></div>
                 <div class="swiper-button-prev"></div>
                 <div class="swiper-button-next"></div>
             </div>
@@ -98,32 +56,28 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            if (typeof Swiper !== 'undefined') {
-                new Swiper('#gallery-swiper', {
-                    slidesPerView: 3,
-                    spaceBetween: 20,
-                    loop: true,
-                    autoplay: {
-                        delay: 3000,
-                        disableOnInteraction: false,
-                    },
-                    pagination: {
-                        el: '.swiper-pagination',
-                        clickable: true,
-                    },
-                    navigation: {
-                        nextEl: '.swiper-button-prev',
-                        prevEl: '.swiper-button-next',
-                    },
-                    breakpoints: {
-                        320: { slidesPerView: 1 },
-                        1024: { slidesPerView: 2 },
-                        1280: { slidesPerView: 3 },
-                    },
-                });
-            } else {
-                console.error('Swiper is not defined. Ensure the Swiper library is loaded.');
-            }
+            new Swiper('#gallery-swiper', {
+                slidesPerView: 3,
+                spaceBetween: 24,
+                loop: true,
+                autoplay: {
+                    delay: 4000,
+                    disableOnInteraction: false,
+                },
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                },
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+                breakpoints: {
+                    320: { slidesPerView: 1 },
+                    768: { slidesPerView: 2 },
+                    1280: { slidesPerView: 3 },
+                },
+            });
         });
     </script>
 @endpush

@@ -1,68 +1,80 @@
-<section id="how-it-works" class="py-10 mt-5 lg:mt-[150px] bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 text-center lg:text-left mb-16">
-            How It Works
-        </h2>
-        
-        <div class="flex flex-col lg:flex-row items-center justify-between space-y-12 lg:space-y-0 lg:space-x-8">
-            @php
-                $steps = [
-                    [
-                        'number' => 1,
-                        'title' => 'Upload',
-                        'subtitle' => 'a Selfie',
-                        'description' => 'Simply upload a selfie to get started with our advanced face recognition technology.',
-                    ],
-                    [
-                        'number' => 2,
-                        'title' => 'View',
-                        'subtitle' => 'Your Photos',
-                        'description' => 'Browse through all the photos where you appear, organized and grouped automatically.',
-                    ],
-                    [
-                        'number' => 3,
-                        'title' => 'Download or',
-                        'subtitle' => 'Order Merchandise',
-                        'description' => 'Download your photos or order custom merchandise with your favorite memories.',
-                    ],
-                ];
-            @endphp
+<section class="py-24 bg-gradient-to-br from-gray-50 to-blue-50">
+    <div class="container mx-auto px-6">
+        <!-- Header -->
+        <div class="text-center mb-20">
+            <span
+                class="inline-flex items-center px-4 py-2 rounded-full bg-purple-100 text-purple-800 text-sm font-medium mb-6 shadow-sm">
+                ⚡ How It Works
+            </span>
+            <h2 class="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-6">
+                Simple. Smart. Seamless.
+            </h2>
+            <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
+                Get started in minutes with our intuitive three-step process
+            </p>
+        </div>
 
-            @foreach ($steps as $index => $step)
-                <div class="flex-1 text-center group">
-                    <div class="relative mb-6">
-                        <div class="bg-blue-600 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4 group-hover:bg-blue-700 transition-colors duration-300">
-                            {{ $step['number'] }}
-                        </div>
-                        <div class="bg-blue-50 rounded-2xl p-6 group-hover:bg-blue-100 transition-colors duration-300">
-                            @if ($step['number'] == 1)
-                                <svg class="h-12 w-12 text-blue-600 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                </svg>
-                            @elseif ($step['number'] == 2)
-                                <svg class="h-12 w-12 text-blue-600 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z M9 10h.01M15 10h.01" />
-                                </svg>
-                            @elseif ($step['number'] == 3)
-                                <svg class="h-12 w-12 text-blue-600 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                </svg>
-                            @endif
-                        </div>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-1">{{ $step['title'] }}</h3>
-                    <h4 class="text-lg text-blue-600 font-semibold mb-3">{{ $step['subtitle'] }}</h4>
-                    <p class="text-gray-600 leading-relaxed">{{ $step['description'] }}</p>
+        <!-- Steps -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-6xl mx-auto">
+            <!-- Step 1 -->
+            <div class="text-center group">
+                <div
+                    class="w-24 h-24 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl group-hover:scale-110 transition-transform duration-300">
+                    <!-- Camera Icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-white" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 7h4l2-3h6l2 3h4v13H3V7z" />
+                    </svg>
                 </div>
+                <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">1. Upload Your Photos</h3>
+                    <p class="text-gray-600 text-lg leading-relaxed">
+                        Simply upload your photos or connect your existing photo libraries. Our AI instantly begins
+                        processing and organizing.
+                    </p>
+                </div>
+            </div>
 
-                @if ($index < count($steps) - 1)
-                    <div class="hidden lg:block">
-                        <svg class="h-8 w-8 text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </div>
-                @endif
-            @endforeach
+            <!-- Step 2 -->
+            <div class="text-center group">
+                <div
+                    class="w-24 h-24 bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl group-hover:scale-110 transition-transform duration-300">
+                    <!-- Search Icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-white" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z" />
+                    </svg>
+                </div>
+                <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">2. AI Recognition</h3>
+                    <p class="text-gray-600 text-lg leading-relaxed">
+                        Our advanced AI identifies faces, objects, and scenes, automatically tagging and organizing your
+                        entire collection.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="text-center group">
+                <div
+                    class="w-24 h-24 bg-gradient-to-r from-green-500 to-teal-500 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl group-hover:scale-110 transition-transform duration-300">
+                    <!-- Heart Icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-white" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4.318 6.318a4.5 4.5 0 010 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                </div>
+                <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">3. Enjoy & Share</h3>
+                    <p class="text-gray-600 text-lg leading-relaxed">
+                        Find any photo instantly, create personalized merchandise, and share your memories with loved
+                        ones.
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
 </section>
