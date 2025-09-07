@@ -40,43 +40,43 @@ class UploadController extends Controller
         ]);
     }
 
-    public function store(Request $request)
-    {
-        try {
-            // Get authenticated user and their plan
-            $user = Auth::user();
-            $plan = $user->plan;
+ public function store(Request $request)
+{
+    try {
+        // Get authenticated user and their plan
+        $user = Auth::user();
+        $plan = $user->plan;
 
-            // Validate plan restrictions
-            if (!$plan->is_active) {
-                Log::error('Inactive plan attempted upload', ['user_id' => $user->id, 'plan' => $plan->name]);
-                return $this->errorResponse('Your plan is inactive.', 403);
-            }
+        // Validate plan restrictions
+        if (!$plan->is_active) {
+            Log::error('Inactive plan attempted upload', ['user_id' => $user->id, 'plan' => $plan->name]);
+            return $this->errorResponse('Your plan is inactive.', 403);
+        }
 
-            // Check daily upload limit
-            if ($plan->photo_upload_limit > 0) {
-                $todayUploads = Photo::where('user_id', $user->id)
-                    ->whereDate('created_at', Carbon::today())
-                    ->count();
-                $newFilesCount = count($request->file('files') ?? []);
-                if ($todayUploads + $newFilesCount > $plan->photo_upload_limit) {
-                    Log::error('Daily upload limit exceeded', ['user_id' => $user->id, 'limit' => $plan->photo_upload_limit]);
-                    return $this->errorResponse('Daily upload limit exceeded.', 403);
-                }
+        // Check daily upload limit
+        if ($plan->photo_upload_limit > 0) {
+            $todayUploads = Photo::where('user_id', $user->id)
+                ->whereDate('created_at', Carbon::today())
+                ->count();
+            $newFilesCount = count($request->file('files') ?? []);
+            if ($todayUploads + $newFilesCount > $plan->photo_upload_limit) {
+                Log::error('Daily upload limit exceeded', ['user_id' => $user->id, 'limit' => $plan->photo_upload_limit]);
+                return $this->errorResponse('Daily upload limit exceeded.', 403);
             }
+        }
 
-            // Check storage limit
-            if ($plan->storage_limit > 0) {
-                $usedStorage = Photo::where('user_id', $user->id)->sum('file_size');
-                $newFilesSize = 0;
-                foreach ($request->file('files') ?? [] as $file) {
-                    $newFilesSize += $file->getSize() / (1024 * 1024); // Convert to MB
-                }
-                if (($usedStorage + $newFilesSize) / 1024 > $plan->storage_limit) {
-                    Log::error('Storage limit exceeded', ['user_id' => $user->id, 'used' => $usedStorage, 'limit' => $plan->storage_limit]);
-                    return $this->errorResponse('Storage limit exceeded.', 403);
-                }
+        // Check storage limit
+        if ($plan->storage_limit > 0) {
+            $usedStorage = Photo::where('user_id', $user->id)->sum('file_size');
+            $newFilesSize = 0;
+            foreach ($request->file('files') ?? [] as $file) {
+                $newFilesSize += $file->getSize() / (1024 * 1024); // Convert to MB
             }
+            if (($usedStorage + $newFilesSize) / 1024 > $plan->storage_limit) {
+                Log::error('Storage limit exceeded', ['user_id' => $user->id, 'used' => $usedStorage, 'limit' => $plan->storage_limit]);
+                return $this->errorResponse('Storage limit exceeded.', 403);
+            }
+        }
 
             // Validate request
             $validated = $request->validate([
@@ -95,9 +95,9 @@ class UploadController extends Controller
             $photos = [];
             $files = $request->file('files') ?? [];
 
-            if (empty($files)) {
-                return $this->errorResponse('No files uploaded.', 422);
-            }
+        if (empty($files)) {
+            return $this->errorResponse('No files uploaded.', 422);
+        }
 
             foreach ($files as $file) {
                 if (!$file->isValid()) {
@@ -300,40 +300,40 @@ class UploadController extends Controller
                 ];
             }
 
-            if (empty($photos)) {
-                return $this->errorResponse('No valid files uploaded.', 422);
-            }
-
-            // Return response based on request type
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => true,
-                    'photos' => $photos,
-                ], 201);
-            }
-
-            return redirect()->route('photos.store')->with([
-                'success' => 'Photos uploaded successfully.',
-                'urls' => array_column($photos, 'url'),
-            ]);
-        } catch (ValidationException $e) {
-            Log::error('Validation failed', ['errors' => $e->errors(), 'user_id' => Auth::id()]);
-            if ($request->expectsJson()) {
-                return response()->json(['success' => false, 'errors' => $e->errors()], 422);
-            }
-            return redirect()->back()->withErrors($e->errors())->withInput();
-        } catch (\Exception $e) {
-            Log::error('Upload error', [
-                'user_id' => Auth::id(),
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-            if ($request->expectsJson()) {
-                return response()->json(['success' => false, 'message' => 'Upload failed: ' . $e->getMessage()], 500);
-            }
-            return redirect()->back()->with('error', 'Upload failed: ' . $e->getMessage())->withInput();
+        if (empty($photos)) {
+            return $this->errorResponse('No valid files uploaded.', 422);
         }
+
+        // Return response based on request type
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'photos' => $photos,
+            ], 201);
+        }
+
+        return redirect()->route('photos.store')->with([
+            'success' => 'Photos uploaded successfully.',
+            'urls' => array_column($photos, 'url'),
+        ]);
+    } catch (ValidationException $e) {
+        Log::error('Validation failed', ['errors' => $e->errors(), 'user_id' => Auth::id()]);
+        if ($request->expectsJson()) {
+            return response()->json(['success' => false, 'errors' => $e->errors()], 422);
+        }
+        return redirect()->back()->withErrors($e->errors())->withInput();
+    } catch (\Exception $e) {
+        Log::error('Upload error', [
+            'user_id' => Auth::id(),
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+        if ($request->expectsJson()) {
+            return response()->json(['success' => false, 'message' => 'Upload failed: ' . $e->getMessage()], 500);
+        }
+        return redirect()->back()->with('error', 'Upload failed: ' . $e->getMessage())->withInput();
     }
+}
 
     protected function errorResponse($message, $status)
     {
@@ -341,6 +341,136 @@ class UploadController extends Controller
             return response()->json(['success' => false, 'message' => $message], $status);
         }
         return redirect()->back()->with('error', $message)->withInput();
+    }
+
+
+    public function rename(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'event' => 'required|string|max:255',
+            'newName' => 'required|string|max:255|different:event',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+            ], 422);
+        }
+
+        $user = Auth::user();
+        $event = $request->input('event');
+        $newName = $request->input('newName');
+
+        // Check if the album exists for the user
+        $photos = Photo::where('user_id', $user->id)
+            ->where('folder_name', $event)
+            ->exists();
+
+        if (!$photos) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Album not found or you do not have permission.',
+            ], 404);
+        }
+
+        // Check if the new album name already exists
+        $nameExists = Photo::where('user_id', $user->id)
+            ->where('folder_name', $newName)
+            ->exists();
+
+        if ($nameExists) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An album with this name already exists.',
+            ], 422);
+        }
+
+        // Update the folder_name for all photos in the album
+        Photo::where('user_id', $user->id)
+            ->where('folder_name', $event)
+            ->update(['folder_name' => $newName]);
+
+        // Update collaborator records if any
+        Collaborator::where('user_id', $user->id)
+            ->where('album_name', $event)
+            ->update(['album_name' => $newName]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Album renamed successfully.',
+        ]);
+    }
+
+    public function invite(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'event' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+            ], 422);
+        }
+
+        $user = Auth::user();
+        $event = $request->input('event');
+        $email = $request->input('email');
+
+        // Check if the album exists for the user
+        $albumExists = Photo::where('user_id', $user->id)
+            ->where('folder_name', $event)
+            ->exists();
+
+        if (!$albumExists) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Album not found or you do not have permission.',
+            ], 404);
+        }
+
+        // Check if the email is already invited
+        $alreadyInvited = Collaborator::where('album_name', $event)
+            ->where('email', $email)
+            ->exists();
+
+        if ($alreadyInvited) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This user is already invited to the album.',
+            ], 422);
+        }
+
+        // Create a collaborator record
+        Collaborator::create([
+            'user_id' => $user->id,
+            'album_name' => $event,
+            'email' => $email,
+        ]);
+
+        // Send notification (assuming a notification class is set up)
+        try {
+            $recipient = \App\Models\User::where('email', $email)->first();
+            if ($recipient) {
+                Notification::send($recipient, new AlbumInvitation($event, $user));
+            } else {
+                // Optionally send an email to non-registered users
+                \Illuminate\Support\Facades\Mail::to($email)->send(
+                    new \App\Mail\AlbumInvitationMail($event, $user)
+                );
+            }
+        } catch (\Exception $e) {
+            // Log the error but don't fail the invitation
+            \Log::error('Failed to send invitation notification: ' . $e->getMessage());
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Invitation sent successfully.',
+        ]);
     }
 
     public function index()
@@ -351,6 +481,178 @@ class UploadController extends Controller
     /**
      * Store a newly created photo (API).
      */
+
+
+    
+
+    public function update(Request $request)
+    {
+        try {
+            $user = Auth::user();
+            $validated = $request->validate([
+                'image' => 'required|string', // Base64 encoded image
+                'photo_id' => 'required|exists:photos,id,user_id,' . $user->id,
+            ]);
+
+            $photo = Photo::findOrFail($validated['photo_id']);
+            $plan = $user->plan;
+
+            // Check storage limit
+            if ($plan->storage_limit > 0) {
+                $usedStorage = Photo::where('user_id', $user->id)->sum('file_size');
+                // Estimate new file size (base64 to bytes, approximate)
+                $newFileSize = strlen(base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $validated['image']))) / (1024 * 1024);
+                if (($usedStorage - $photo->file_size + $newFileSize) / 1024 > $plan->storage_limit) {
+                    Log::error('Storage limit exceeded on update', ['user_id' => $user->id, 'used' => $usedStorage, 'limit' => $plan->storage_limit]);
+                    return response()->json(['success' => false, 'message' => 'Storage limit exceeded.'], 403);
+                }
+            }
+
+            // Decode base64 image
+            $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $validated['image']));
+            if (!$imageData) {
+                Log::error('Invalid base64 image data', ['user_id' => $user->id, 'photo_id' => $photo->id]);
+                return response()->json(['success' => false, 'message' => 'Invalid image data.'], 422);
+            }
+
+            // Generate new file path
+            $fileName = Str::random(40) . '.jpg';
+            $directory = 'uploads';
+            $newPath = "Uploads/$fileName";
+
+            // Save to S3
+            $success = Storage::disk('s3')->put($newPath, $imageData);
+            if (!$success) {
+                Log::error('S3 upload failed for edited image', ['user_id' => $user->id, 'path' => $newPath]);
+                return response()->json(['success' => false, 'message' => 'Failed to save image to S3.'], 500);
+            }
+
+            // Verify S3 object
+            $maxRetries = 5;
+            $retryDelay = 1;
+            $attempt = 0;
+            while ($attempt < $maxRetries) {
+                try {
+                    Storage::disk('s3')->get($newPath);
+                    break;
+                } catch (\Exception $e) {
+                    if ($attempt === $maxRetries - 1) {
+                        Log::error('S3 object not available after upload', ['user_id' => $user->id, 'path' => $newPath]);
+                        return response()->json(['success' => false, 'message' => 'S3 object not available.'], 500);
+                    }
+                    sleep($retryDelay);
+                    $attempt++;
+                }
+            }
+
+            // Delete old image from S3
+            if (Storage::disk('s3')->exists($photo->image_path)) {
+                Storage::disk('s3')->delete($photo->image_path);
+            }
+
+            // Update photo record
+            $photo->update([
+                'image_path' => $newPath,
+                'file_size' => strlen($imageData) / (1024 * 1024), // Store in MB
+                'updated_at' => now(),
+            ]);
+
+            Log::info('Photo updated successfully', [
+                'user_id' => $user->id,
+                'photo_id' => $photo->id,
+                'new_path' => $newPath,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'url' => Storage::disk('s3')->url($newPath),
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Photo update error', [
+                'user_id' => Auth::id(),
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json(['success' => false, 'message' => 'Failed to save image: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function enhance(Request $request)
+    {
+        try {
+            $user = Auth::user();
+            $validated = $request->validate([
+                'image' => 'required|string',
+                'type' => 'required|in:sharpen,color_correct',
+                'photo_id' => 'required|exists:photos,id,user_id,' . $user->id,
+            ]);
+
+            $plan = $user->plan;
+            if (!$plan->facial_recognition_enabled) {
+                Log::error('AI enhancement not allowed', ['user_id' => $user->id, 'plan' => $plan->name]);
+                return response()->json(['success' => false, 'message' => 'AI enhancements require a Pro plan.'], 403);
+            }
+
+            // Decode base64 image
+            $imageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $validated['image']));
+            if (!$imageData) {
+                Log::error('Invalid base64 image data for enhancement', ['user_id' => $user->id, 'photo_id' => $validated['photo_id']]);
+                return response()->json(['success' => false, 'message' => 'Invalid image data.'], 422);
+            }
+
+            // Save temporary file to S3 for Rekognition
+            $tempFileName = 'temp/' . Str::random(40) . '.jpg';
+            $success = Storage::disk('s3')->put($tempFileName, $imageData);
+            if (!$success) {
+                Log::error('S3 upload failed for AI enhancement', ['user_id' => $user->id, 'path' => $tempFileName]);
+                return response()->json(['success' => false, 'message' => 'Failed to upload image for enhancement.'], 500);
+            }
+
+            // Use Intervention Image for local processing as a fallback
+            $image = Image::make($imageData);
+            if ($validated['type'] === 'sharpen') {
+                $image->sharpen(10); // Basic sharpening
+            } elseif ($validated['type'] === 'color_correct') {
+                $image->brightness(10)->contrast(10); // Basic color correction
+            }
+
+            // Save enhanced image to S3
+            $enhancedFileName = 'Uploads/enhanced_' . Str::random(40) . '.jpg';
+            $success = Storage::disk('s3')->put($enhancedFileName, $image->encode('jpg', 80));
+            if (!$success) {
+                Log::error('S3 upload failed for enhanced image', ['user_id' => $user->id, 'path' => $enhancedFileName]);
+                Storage::disk('s3')->delete($tempFileName);
+                return response()->json(['success' => false, 'message' => 'Failed to save enhanced image.'], 500);
+            }
+
+            // Clean up temporary file
+            Storage::disk('s3')->delete($tempFileName);
+
+            // Note: AWS Rekognition does not directly support sharpening or color correction.
+            // For true AI-based enhancements, consider using AWS Lambda with a custom image processing library
+            // or a third-party service like AWS SageMaker or a dedicated image processing API.
+            // The above uses Intervention Image as a fallback.
+
+            Log::info('Image enhanced successfully', [
+                'user_id' => $user->id,
+                'photo_id' => $validated['photo_id'],
+                'type' => $validated['type'],
+                'path' => $enhancedFileName,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'url' => Storage::disk('s3')->url($enhancedFileName),
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Image enhancement error', [
+                'user_id' => Auth::id(),
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json(['success' => false, 'message' => 'Failed to enhance image: ' . $e->getMessage()], 500);
+        }
+    }
 
     /**
      * Display the specified photo (API).
@@ -425,33 +727,33 @@ class UploadController extends Controller
                 'tags' => implode(', ', $tags),
             ]);
 
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::error('Validation error: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid input: ' . $e->getMessage(),
-                'errors' => $e->errors()
-            ], 422);
-        } catch (\Aws\Exception\CredentialsException $e) {
-            Log::error('AWS credentials error: ' . $e->getAwsErrorMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'AWS credentials invalid'
-            ], 500);
-        } catch (\Aws\Exception\AwsException $e) {
-            Log::error('Rekognition error: ' . $e->getAwsErrorMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'AWS analysis failed: ' . $e->getAwsErrorMessage()
-            ], 500);
-        } catch (\Exception $e) {
-            Log::error('General analysis error: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'Analysis failed: ' . $e->getMessage()
-            ], 500);
-        }
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        Log::error('Validation error: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'Invalid input: ' . $e->getMessage(),
+            'errors' => $e->errors()
+        ], 422);
+    } catch (\Aws\Exception\CredentialsException $e) {
+        Log::error('AWS credentials error: ' . $e->getAwsErrorMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'AWS credentials invalid'
+        ], 500);
+    } catch (\Aws\Exception\AwsException $e) {
+        Log::error('Rekognition error: ' . $e->getAwsErrorMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'AWS analysis failed: ' . $e->getAwsErrorMessage()
+        ], 500);
+    } catch (\Exception $e) {
+        Log::error('General analysis error: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'Analysis failed: ' . $e->getMessage()
+        ], 500);
     }
+}
 
 
 
@@ -488,7 +790,7 @@ class UploadController extends Controller
                 return response()->json(['success' => true, 'message' => 'Photo deleted successfully.'], 200);
             }
 
-            return redirect()->route('photos.store')->with('success', 'Photo deleted successfully.');
+            return redirect()->back()->with('success', 'Photo deleted successfully.');
         } catch (\Exception $e) {
             Log::error('Delete error', [
                 'user_id' => Auth::id(),
