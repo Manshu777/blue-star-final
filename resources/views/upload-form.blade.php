@@ -10,6 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
     <script src="https://cdn.jsdelivr.net/npm/video.js@7/dist/video.min.js"></script>
+
     <link href="https://cdn.jsdelivr.net/npm/video.js@7/dist/video-js.min.css" rel="stylesheet">
     <style>
         .drag-drop-zone {
@@ -92,14 +93,14 @@
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen font-sans antialiased"
-      x-data="{ 
-          tab: localStorage.getItem('activeTab') || 'dashboard', 
-          sidebarOpen: false, 
-          isMobile: window.innerWidth < 768, 
-          darkMode: false, 
-          selectedPhoto: null, 
-          searchResults: [], 
-          albums: {} 
+      x-data="{
+          tab: localStorage.getItem('activeTab') || 'dashboard',
+          sidebarOpen: false,
+          isMobile: window.innerWidth < 768,
+          darkMode: false,
+          selectedPhoto: null,
+          searchResults: [],
+          albums: {}
       }"
       x-init="$watch('tab', value => localStorage.setItem('activeTab', value))">
     <div class="flex h-screen overflow-hidden">
@@ -197,59 +198,182 @@
                     </button>
                 </div>
                 <!-- Dashboard Section -->
-                <div x-show="tab === 'dashboard'" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-                    <h2 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">Dashboard Overview</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                        <div class="bg-blue-100 dark:bg-blue-900 p-4 rounded-lg text-center">
-                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Total Uploads</h3>
-                            <p class="text-2xl font-bold text-blue-600 dark:text-blue-300">100</p>
-                        </div>
-                        <div class="bg-blue-100 dark:bg-blue-900 p-4 rounded-lg text-center">
-                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Storage Used</h3>
-                            <p class="text-2xl font-bold text-blue-600 dark:text-blue-300">100 MB</p>
-                        </div>
-                        <div class="bg-blue-100 dark:bg-blue-900 p-4 rounded-lg text-center">
-                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Active Plan</h3>
-                            <p class="text-2xl font-bold text-blue-600 dark:text-blue-300">{{ auth()->user()->subscription ? auth()->user()->subscription->plan_name : 'Free' }}</p>
-                        </div>
+                  <div x-show="tab === 'dashboard'" class="bg-gray-100 rounded-2xl shadow-xl p-8 text-gray-800">
+    <!-- Dashboard Header -->
+    <h2 class="text-3xl font-extrabold text-center mb-10 flex items-center justify-center gap-2">
+        <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" stroke-width="2"
+             viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                d="M3 12l2-2m0 0l7-7 7 7M13 5v6h6m-6 0v6m0-6H7"></path>
+        </svg>
+        Dashboard Overview
+    </h2>
+
+    <!-- Top Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Total Uploads -->
+        <div class="bg-white p-6 rounded-xl shadow hover:scale-105 transition transform duration-300">
+            <div class="flex items-center justify-center gap-3">
+                <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" stroke-width="2"
+                     viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M3 7l9-4 9 4-9 4-9-4zm0 10l9 4 9-4m-18-6l9 4 9-4"></path>
+                </svg>
+                <h3 class="text-lg font-semibold">Total Uploads</h3>
+            </div>
+            <p class="text-3xl font-bold mt-2">{{ $totalUploads }}</p>
+            <p class="text-sm mt-2">Events/Albums: {{ $totalEvents }}</p>
+            <p class="text-sm">Featured: {{ $featuredPhotos }}</p>
+            <p class="text-sm">With Faces: {{ $photosWithFaces }}</p>
+        </div>
+
+        <!-- Storage Used -->
+        <div class="bg-white p-6 rounded-xl shadow hover:scale-105 transition transform duration-300">
+            <div class="flex items-center justify-center gap-3">
+                <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" stroke-width="2"
+                     viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M12 4v16m8-8H4"></path>
+                </svg>
+                <h3 class="text-lg font-semibold">Storage Used</h3>
+            </div>
+            <p class="text-3xl font-bold mt-2">{{ $storageUsedGB }} GB / {{ $storageLimitGB > 0 ? $storageLimitGB . ' GB' : 'Unlimited' }}</p>
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mt-3">
+                <div class="bg-gray-600 h-2.5 rounded-full transition-all duration-500"
+                     style="width: {{ $storageUsagePercent }}%"></div>
+            </div>
+            <p class="text-sm mt-2">{{ $storageUsagePercent }}% Used</p>
+        </div>
+
+        <!-- Active Plan -->
+        <div class="bg-white p-6 rounded-xl shadow hover:scale-105 transition transform duration-300">
+            <div class="flex items-center justify-center gap-3">
+                <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" stroke-width="2"
+                     viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M5 13l4 4L19 7"></path>
+                </svg>
+                <h3 class="text-lg font-semibold">Active Plan</h3>
+            </div>
+            <p class="text-3xl font-bold mt-2">{{ $plan->name ?? 'Free' }}</p>
+            <p class="text-sm mt-2">Daily Upload Limit: {{ $dailyUploadLimit > 0 ? $dailyUploadLimit : 'Unlimited' }}</p>
+            <p class="text-sm">Facial Recognition: {{ $plan->facial_recognition_enabled ? 'Enabled' : 'Disabled' }}</p>
+        </div>
+    </div>
+
+    <!-- Daily Uploads -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-xl shadow hover:scale-105 transition transform duration-300">
+            <div class="flex items-center justify-center gap-3">
+                <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" stroke-width="2"
+                     viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M8 7V3m8 4V3M4 11h16M4 19h16"></path>
+                </svg>
+                <h3 class="text-lg font-semibold">Today's Uploads</h3>
+            </div>
+            <p class="text-3xl font-bold mt-2">{{ $todayUploads }} / {{ $dailyUploadLimit > 0 ? $dailyUploadLimit : 'Unlimited' }}</p>
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mt-3">
+                <div class="bg-gray-600 h-2.5 rounded-full transition-all duration-500"
+                     style="width: {{ $dailyUploadUsagePercent }}%"></div>
+            </div>
+            <p class="text-sm mt-2">{{ $dailyUploadUsagePercent }}% of Daily Limit</p>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="bg-white p-6 rounded-xl mb-8 shadow">
+        <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+            <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" stroke-width="2"
+                 viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M12 8v4l3 3"></path>
+            </svg>
+            Recent Activity
+        </h3>
+        <ul class="space-y-3">
+            @forelse ($recentUploads as $upload)
+                <li class="flex items-center space-x-4 bg-gray-100 p-3 rounded-lg hover:bg-gray-200 transition">
+                    <img src="{{ $upload['url'] }}" alt="{{ $upload['title'] }}" class="w-12 h-12 rounded-md object-cover">
+                    <div>
+                        <p class="font-medium">{{ $upload['title'] }}</p>
+                        <p class="text-sm text-gray-500">{{ $upload['date'] }} - {{ $upload['location'] }}</p>
+                        <p class="text-sm text-gray-500">Tags: {{ implode(', ', $upload['tags']) }}</p>
                     </div>
-                    <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
-                        <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Recent Activity</h3>
-                        <ul class="space-y-2">
-                        </ul>
-                    </div>
+                </li>
+            @empty
+                <li class="text-gray-500">No recent uploads.</li>
+            @endforelse
+        </ul>
+    </div>
+
+    <!-- Photos by Event -->
+    <div class="bg-white p-6 rounded-xl shadow">
+        <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+            <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" stroke-width="2"
+                 viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M3 7h18M3 12h18M3 17h18"></path>
+            </svg>
+            All Photos by Event
+        </h3>
+        @forelse ($photos as $event => $eventPhotos)
+            <div class="mb-6">
+                <h4 class="text-lg font-medium mb-3">{{ $event ?: 'Uncategorized' }}</h4>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    @foreach ($eventPhotos as $photo)
+                        <div class="relative group overflow-hidden rounded-lg shadow">
+                            <img src="{{ $photo['url'] }}" alt="{{ $photo['title'] }}"
+                                 class="w-full h-32 object-cover group-hover:scale-110 transition duration-500">
+                            <p class="absolute bottom-0 left-0 w-full bg-black/40 text-white text-xs px-2 py-1 opacity-90 group-hover:opacity-100 transition">
+                                {{ $photo['title'] }}
+                            </p>
+                        </div>
+                    @endforeach
                 </div>
+            </div>
+        @empty
+            <p class="text-gray-500">No photos available.</p>
+        @endforelse
+    </div>
+</div>
+
+
                 <!-- Upload Media Section -->
+
 
                 <div x-show="tab === 'upload'" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
     <h2 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">Upload Media</h2>
     @if (session('success'))
-        <div class="bg-blue-100 dark:bg-blue-900 border-l-4 border-blue-500 text-blue-700 dark:text-blue-200 p-2 mb-6 rounded" role="alert">
-            {{ session('success') }}
+        <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 5000)" x-show="show"
+             class="bg-blue-100 dark:bg-blue-900 border-l-4 border-blue-500 text-blue-700 dark:text-blue-200 p-2 mb-6 rounded" role="alert">
+            <span x-text="session('success')"></span>
             @if (session('urls'))
                 <br>
                 @foreach (session('urls') as $url)
-                    <a href="{{ $url }}" class="underline font-medium" target="_blank">View Media</a><br>
+                    <a :href="'{{ $url }}'" class="underline font-medium" target="_blank">View Media</a><br>
                 @endforeach
             @endif
         </div>
     @endif
     @if (session('error'))
-        <div class="bg-red-100 dark:bg-red-900 border-l-4 border-red-500 text-red-700 dark:text-red-200 p-2 mb-6 rounded" role="alert">
-            {{ session('error') }}
+        <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 5000)" x-show="show"
+             class="bg-red-100 dark:bg-red-900 border-l-4 border-red-500 text-red-700 dark:text-red-200 p-2 mb-6 rounded" role="alert">
+            <span x-text="session('error')"></span>
         </div>
     @endif
     @if ($errors->any())
-        <div class="bg-red-100 dark:bg-red-900 border-l-4 border-red-500 text-red-700 dark:text-red-200 p-2 mb-6 rounded" role="alert">
+        <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 5000)" x-show="show"
+             class="bg-red-100 dark:bg-red-900 border-l-4 border-red-500 text-red-700 dark:text-red-200 p-2 mb-6 rounded" role="alert">
             <ul>
                 @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
+                    <li x-text="`{{ $error }}`"></li>
                 @endforeach
             </ul>
         </div>
     @endif
     <form action="{{ route('photos.store') }}" method="POST" enctype="multipart/form-data"
-          @submit.prevent="handleSubmit" x-data="uploadFormData()">
+          @submit.prevent="handleSubmit" x-data="uploadFormData()" x-on:submit="showSweetAlert($event)">
         @csrf
         <!-- Media Selection -->
         <div class="mb-6 relative group">
@@ -435,118 +559,183 @@
     </form>
 </div>
 
-              
+
                 <!-- Photos Album Section -->
-                <div x-show="tab === 'album'" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-                    <h2 class="text-2xl font-bold text-center mb-6 text-gray-800 dark:text-white">📸 Photo Gallery</h2>
-                    <!-- Recent Uploads -->
-                    <div class="mb-10">
-                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-3">🆕 Recent Uploads</h3>
-                        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
-                            @foreach($recentUploads as $photo)
-                                <div class="relative group">
-                                    <img src="{{ $photo['url'] }}" class="w-full h-28 object-cover rounded-lg shadow">
-                                    <div class="absolute top-1 right-1 flex space-x-1 opacity-0 gallery-button">
-                                        <form action="{{ route('photos.destroy', $photo['id']) }}" method="POST"
-                                              @submit.prevent="deletePhoto($event, {{ $photo['id'] }})">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit"
-                                                    class="bg-red-500 text-white rounded-full h-6 w-6 flex items-center justify-center hover:bg-red-600 transition">
-                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
-                                            </button>
-                                        </form>
-                                        <button @click="selectedPhoto = '{{ $photo['url'] }}'; tab = 'edit'; if(isMobile) sidebarOpen = false"
-                                                class="bg-blue-500 text-white rounded-full h-6 w-6 flex items-center justify-center hover:bg-blue-600 transition">
-                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
+
+          <div x-data="album" x-show="tab === 'album'" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+    <h2 class="text-2xl font-bold text-center mb-6 text-gray-800 dark:text-white">📸 Photo Gallery</h2>
+
+    <!-- Tag Search with Auto-Suggestion -->
+    <div class="mb-6 relative">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">🔍 Search by Tags</h3>
+        <input 
+            type="text" 
+            x-model="searchTags" 
+            @input.debounce.500ms="filterPhotos(); updateSuggestions()" 
+            @keydown.arrow-down.prevent="moveSelection(1)"
+            @keydown.arrow-up.prevent="moveSelection(-1)"
+            @keydown.enter.prevent="selectSuggestion()"
+            @keydown.esc="suggestions = []"
+            placeholder="Enter tags (e.g., Nature, Beach)" 
+            class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white"
+        >
+        <!-- Suggestions Dropdown -->
+        <div x-show="suggestions.length > 0" class="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-auto">
+            <template x-for="(suggestion, index) in suggestions" :key="suggestion">
+                <div 
+                    class="px-4 py-2 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900 text-gray-800 dark:text-white"
+                    :class="{ 'bg-blue-100 dark:bg-blue-900': selectedSuggestionIndex === index }"
+                    @click="selectSuggestion(suggestion)"
+                    x-text="suggestion"
+                ></div>
+            </template>
+        </div>
+    </div>
+
+    <!-- Recent Uploads -->
+    <div class="mb-10">
+        <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-3">🆕 Recent Uploads</h3>
+        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+            <template x-for="photo in recentUploads" :key="photo.id">
+                <div class="relative group" @click="openPreview(photo.url, photo)">
+                    <img :src="photo.url" class="w-full h-28 object-cover rounded-lg shadow cursor-pointer">
+                    <div class="absolute top-1 right-1 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity gallery-button">
+                        <form >
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit"
+                                    class="bg-red-500 text-white rounded-full h-6 w-6 flex items-center justify-center hover:bg-red-600 transition">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </form>
+                        <button @click.stop="selectedPhoto = photo.url; tab = 'edit'; if(isMobile) sidebarOpen = false"
+                                class="bg-blue-500 text-white rounded-full h-6 w-6 flex items-center justify-center hover:bg-blue-600 transition">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                        </button>
                     </div>
-                    <!-- Albums -->
-                    @if(!empty($photos))
-                        <div class="space-y-8">
-                            @foreach($photos as $event => $eventPhotos)
-                                <div x-data="{ renameOpen: false, newName: '{{ $event }}', inviteOpen: false, inviteEmail: '' }">
-                                    <div class="flex items-center justify-between mb-3">
-                                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white">📂 {{ $event ?? 'Unknown Event' }}</h3>
-                                        <div class="flex space-x-2">
-                                            <button @click="renameOpen = true"
-                                                    class="bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 py-1 px-3 rounded hover:bg-gray-300 dark:hover:bg-gray-500">
-                                                Rename
-                                            </button>
-                                            <button @click="deleteAlbum('{{ $event }}')"
-                                                    class="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600">
-                                                Delete
-                                            </button>
-                                            <button @click="inviteOpen = true"
-                                                    class="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600">
-                                                Invite
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <!-- Rename Form -->
-                                    <div x-show="renameOpen" class="mb-4">
-                                        <form @submit.prevent="renameAlbum('{{ $event }}', newName)">
-                                            <input type="text" x-model="newName" class="form-input p-2 mr-2 border-gray-300 dark:border-gray-600 rounded-md"
-                                                   placeholder="New event name">
-                                            <button type="submit" class="bg-blue-600 text-white py-1 px-3 rounded hover:bg-blue-700">Save</button>
-                                            <button type="button" @click="renameOpen = false" class="bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 py-1 px-3 rounded hover:bg-gray-300 dark:hover:bg-gray-500">Cancel</button>
-                                        </form>
-                                    </div>
-                                    <!-- Invite Form -->
-                                    <div x-show="inviteOpen" class="mb-4">
-                                        <form @submit.prevent="inviteCollaborator('{{ $event }}', inviteEmail)">
-                                            <input type="email" x-model="inviteEmail" class="form-input p-2 mr-2 border-gray-300 dark:border-gray-600 rounded-md"
-                                                   placeholder="Collaborator email">
-                                            <button type="submit" class="bg-blue-600 text-white py-1 px-3 rounded hover:bg-blue-700">Send Invite</button>
-                                            <button type="button" @click="inviteOpen = false" class="bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 py-1 px-3 rounded hover:bg-gray-300 dark:hover:bg-gray-500">Cancel</button>
-                                        </form>
-                                    </div>
-                                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                                        @foreach($eventPhotos as $photo)
-                                            <div class="relative bg-gray-50 dark:bg-gray-700 rounded-lg shadow overflow-hidden group">
-                                                <img src="{{ $photo['url'] }}" class="w-full h-40 object-cover">
-                                                <div class="p-2">
-                                                    <p class="text-sm font-medium text-gray-700 dark:text-gray-200 truncate">{{ $photo['title'] }}</p>
-                                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ $photo['location'] }}</p>
-                                                    <p class="text-xs text-gray-400">{{ $photo['date'] }}</p>
-                                                </div>
-                                                <div class="absolute top-1 right-1 flex space-x-1 opacity-0 gallery-button">
-                                                    <form action="{{ route('photos.destroy', $photo['id']) }}" method="POST"
-                                                          @submit.prevent="deletePhoto($event, {{ $photo['id'] }})">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit"
-                                                                class="bg-red-500 text-white rounded-full h-6 w-6 flex items-center justify-center hover:bg-red-600 transition">
-                                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                            </svg>
-                                                        </button>
-                                                    </form>
-                                                    <button @click="selectedPhoto = '{{ $photo['url'] }}'; tab = 'edit'; if(isMobile) sidebarOpen = false"
-                                                            class="bg-blue-500 text-white rounded-full h-6 w-6 flex items-center justify-center hover:bg-blue-600 transition">
-                                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                                        </svg>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    @else
-                        <p class="text-gray-500 dark:text-gray-400 text-center">No photos found. Upload some 📤</p>
-                    @endif
                 </div>
+            </template>
+        </div>
+    </div>
+
+    <!-- Albums -->
+    <div class="space-y-8">
+        <template x-for="(eventPhotos, event) in filteredPhotos" :key="event">
+            <div x-data="{ renameOpen: false, newName: event, inviteOpen: false, inviteEmail: '' }">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-white">📂 <span x-text="event || 'Unknown Event'"></span></h3>
+                    <div class="flex space-x-2">
+                        <button @click="renameOpen = true"
+                                class="bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 py-1 px-3 rounded hover:bg-gray-300 dark:hover:bg-gray-500">
+                            Rename
+                        </button>
+                        <button @click="deleteAlbum(event)"
+                                class="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600">
+                            Delete
+                        </button>
+                        <button @click="inviteOpen = true"
+                                class="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600">
+                            Invite
+                        </button>
+                    </div>
+                </div>
+                <!-- Rename Form -->
+                <div x-show="renameOpen" class="mb-4">
+                    <form @submit.prevent="renameAlbum(event, newName)">
+                        <input type="text" x-model="newName" class="form-input p-2 mr-2 border-gray-300 dark:border-gray-600 rounded-md"
+                               placeholder="New event name">
+                        <button type="submit" class="bg-blue-600 text-white py-1 px-3 rounded hover:bg-blue-700">Save</button>
+                        <button type="button" @click="renameOpen = false" class="bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 py-1 px-3 rounded hover:bg-gray-300 dark:hover:bg-gray-500">Cancel</button>
+                    </form>
+                </div>
+                <!-- Invite Form -->
+                <div x-show="inviteOpen" class="mb-4">
+                    <form @submit.prevent="inviteCollaborator(event, inviteEmail)">
+                        <input type="email" x-model="inviteEmail" class="form-input p-2 mr-2 border-gray-300 dark:border-gray-600 rounded-md"
+                               placeholder="Collaborator email">
+                        <button type="submit" class="bg-blue-600 text-white py-1 px-3 rounded hover:bg-blue-700">Send Invite</button>
+                        <button type="button" @click="inviteOpen = false" class="bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 py-1 px-3 rounded hover:bg-gray-300 dark:hover:bg-gray-500">Cancel</button>
+                    </form>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    <template x-for="photo in eventPhotos" :key="photo.id">
+                        <div class="relative bg-gray-50 dark:bg-gray-700 rounded-lg shadow overflow-hidden group" @click="openPreview(photo.url, photo)">
+                            <img :src="photo.url" style="height:250px" class="w-full h-[200px] object-fill cursor-pointer">
+                            <div class="p-2">
+                                <p class="text-sm font-medium text-gray-700 dark:text-gray-200 truncate" x-text="photo.title"></p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400" x-text="photo.location"></p>
+                                <p class="text-xs text-gray-400" x-text="photo.date"></p>
+                            </div>
+                            <div class="absolute top-1 right-1 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity gallery-button">
+                                <form >
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                            class="bg-red-500 text-white rounded-full h-6 w-6 flex items-center justify-center hover:bg-red-600 transition">
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </form>
+                                <button @click.stop="selectedPhoto = photo.url; tab = 'edit'; if(isMobile) sidebarOpen = false"
+                                        class="bg-blue-500 text-white rounded-full h-6 w-6 flex items-center justify-center hover:bg-blue-600 transition">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </template>
+        <div x-show="Object.keys(filteredPhotos).length === 0" class="text-gray-500 dark:text-gray-400 text-center">
+            No photos found. Try adjusting your search or upload some 📤
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div x-show="showPreview" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @click="showPreview = false">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-3xl w-full" @click.stop>
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Photo Preview</h3>
+                <button @click="showPreview = false" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <img :src="previewPhoto?.url" style="height:350px" class="w-full min-h-[350px] object-contain rounded-lg mb-4">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <p class="text-sm font-medium text-gray-700 dark:text-gray-200">Title: <span x-text="previewPhoto?.title"></span></p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Location: <span x-text="previewPhoto?.location"></span></p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Date: <span x-text="previewPhoto?.date"></span></p>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-700 dark:text-gray-200">Tags:</p>
+                    <div class="flex flex-wrap gap-2">
+                        <template x-for="tag in previewPhoto?.tags" :key="tag">
+                            <span class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs px-2 py-1 rounded" x-text="tag"></span>
+                        </template>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 flex justify-end">
+                <a :href="previewPhoto?.url" download class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition">
+                    Download
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+       
+               
                 <!-- Search & Retrieval Section -->
                 <div x-show="tab === 'search'" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
                     <h2 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">Search Photos</h2>
@@ -694,9 +883,144 @@
             </div>
         </main>
     </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exif-js/2.3.0/exif.js"></script>
+
+
+
+
+
+
+
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('album', () => ({
+            tab: 'album',
+            selectedPhoto: null,
+            searchTags: '',
+            filteredPhotos: @json($photos),
+            showPreview: false,
+            previewPhoto: null,
+            recentUploads: @json($recentUploads),
+            suggestions: [],
+            selectedSuggestionIndex: -1,
+            allTags: [],
+
+            init() {
+                // Collect all unique tags from photos
+                const tags = new Set();
+                Object.values(@json($photos)).flat().forEach(photo => {
+                    if (photo.tags && Array.isArray(photo.tags)) {
+                        photo.tags.forEach(tag => tags.add(tag.trim()));
+                    }
+                });
+                this.allTags = Array.from(tags).sort();
+            },
+
+            updateSuggestions() {
+                const input = this.searchTags.toLowerCase().trim();
+                if (!input) {
+                    this.suggestions = [];
+                    this.selectedSuggestionIndex = -1;
+                    return;
+                }
+                // Get the last tag being typed (for multi-tag input)
+                const lastTag = input.includes(',') ? input.split(',').pop().trim() : input;
+                this.suggestions = this.allTags.filter(tag => 
+                    tag.toLowerCase().includes(lastTag) && !this.searchTags.toLowerCase().includes(tag.toLowerCase())
+                ).slice(0, 5); // Limit to 5 suggestions
+                this.selectedSuggestionIndex = -1;
+            },
+
+            moveSelection(direction) {
+                if (this.suggestions.length === 0) return;
+                let newIndex = this.selectedSuggestionIndex + direction;
+                if (newIndex < -1) newIndex = this.suggestions.length - 1;
+                if (newIndex >= this.suggestions.length) newIndex = -1;
+                this.selectedSuggestionIndex = newIndex;
+            },
+
+            selectSuggestion(suggestion = null) {
+                if (!suggestion && this.selectedSuggestionIndex >= 0) {
+                    suggestion = this.suggestions[this.selectedSuggestionIndex];
+                }
+                if (!suggestion) return;
+                const tags = this.searchTags.split(',').map(tag => tag.trim()).filter(tag => tag);
+                if (tags.length > 0 && this.searchTags.endsWith(',')) {
+                    tags[tags.length - 1] = suggestion;
+                } else if (tags.length > 0) {
+                    tags.pop();
+                    tags.push(suggestion);
+                } else {
+                    tags.push(suggestion);
+                }
+                this.searchTags = tags.join(', ') + ', ';
+                this.suggestions = [];
+                this.selectedSuggestionIndex = -1;
+                this.filterPhotos();
+            },
+
+            filterPhotos() {
+                const tags = this.searchTags.toLowerCase().split(',').map(tag => tag.trim()).filter(tag => tag);
+                if (!tags.length) {
+                    this.filteredPhotos = @json($photos);
+                    return;
+                }
+                const filtered = {};
+                Object.entries(@json($photos)).forEach(([event, photos]) => {
+                    const matchingPhotos = photos.filter(photo => 
+                        tags.every(searchTag => 
+                            photo.tags.some(tag => tag.toLowerCase().includes(searchTag))
+                        )
+                    );
+                    if (matchingPhotos.length) {
+                        filtered[event] = matchingPhotos;
+                    }
+                });
+                this.filteredPhotos = filtered;
+            },
+
+            openPreview(url, photo) {
+                this.previewPhoto = photo;
+                this.showPreview = true;
+            },
+
+            deletePhoto(event, id) {
+                if (confirm('Are you sure you want to delete this photo?')) {
+                    event.target.closest('form').submit();
+                }
+            },
+
+            renameAlbum(event, newName) {
+                console.log(`Renaming album ${event} to ${newName}`);
+                // Implement rename logic (e.g., via fetch/AJAX to backend)
+            },
+
+            deleteAlbum(event) {
+                if (confirm(`Are you sure you want to delete the album ${event}?`)) {
+                    console.log(`Deleting album ${event}`);
+                    // Implement delete logic
+                }
+            },
+
+            inviteCollaborator(event, email) {
+                console.log(`Inviting ${email} to album ${event}`);
+                // Implement invite logic
+            }
+        }));
+    });
+</script>
+
+
+
     <script>
-     
-     function uploadFormData() {
+
+
+
+
+function uploadFormData() {
     return {
         files: [],
         previews: [],
@@ -706,6 +1030,7 @@
         location: '',
         suggestedTags: [],
         selectedTags: [],
+
         init() {
             this.getGeolocation();
             this.$watch('files', () => {
@@ -726,19 +1051,23 @@
                 this.tags = this.selectedTags.join(',');
             });
         },
+
         handleFileChange(event) {
             this.files = Array.from(event.target.files);
         },
+
         handleDrop(event) {
             this.isDragging = false;
             this.files = Array.from(event.dataTransfer.files);
             document.querySelector('#file').files = event.dataTransfer.files;
         },
+
         captureFromCamera() {
             const input = document.querySelector('#file');
             input.setAttribute('capture', 'environment');
             input.click();
         },
+
         extractExif(file) {
             if (file && file.type.startsWith('image/')) {
                 EXIF.getData(file, () => {
@@ -749,6 +1078,7 @@
                 });
             }
         },
+
         getGeolocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition((position) => {
@@ -758,6 +1088,7 @@
                 });
             }
         },
+
         analyzeImage(file) {
             const formData = new FormData();
             formData.append('image', file);
@@ -779,6 +1110,7 @@
             })
             .catch(error => console.error('Analysis error:', error));
         },
+
         toggleTag(tag) {
             if (this.selectedTags.includes(tag)) {
                 this.selectedTags = this.selectedTags.filter(t => t !== tag);
@@ -786,6 +1118,7 @@
                 this.selectedTags.push(tag);
             }
         },
+
         addCustomTags(input) {
             if (input) {
                 const newTags = input.split(',').map(tag => tag.trim()).filter(tag => tag);
@@ -793,27 +1126,71 @@
                 document.querySelector('#custom-tags').value = '';
             }
         },
+
         handleSubmit(event) {
             event.preventDefault();
             const formData = new FormData(event.target);
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', event.target.action);
-            xhr.setRequestHeader('X-CSRF-TOKEN', document.querySelector('meta[name="csrf-token"]').content);
-            xhr.upload.onprogress = (e) => {
-                if (e.lengthComputable) this.progress = Math.round((e.loaded * 100) / e.total);
-            };
-            xhr.onload = () => {
-                if (xhr.status === 200) {
-                    location.reload();
-                } else {
-                    console.log('Upload failed: ' + xhr.responseText);
-                }
-                this.progress = 0;
-            };
-            xhr.send(formData);
-        }
+            this.files.forEach((file, index) => {
+                formData.append(`files[${index}]`, file);
+            });
+
+            Swal.fire({
+                title: 'Uploading...',
+                text: 'Please wait while your media is being uploaded.',
+                icon: 'info',
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', event.target.action);
+                    xhr.setRequestHeader('X-CSRF-TOKEN', document.querySelector('meta[name="csrf-token"]').content);
+                    xhr.upload.onprogress = (e) => {
+                        if (e.lengthComputable) this.progress = Math.round((e.loaded * 100) / e.total);
+                    };
+                    xhr.onload = () => {
+                        if (xhr.status === 201) {
+                            const response = JSON.parse(xhr.responseText);
+                            Swal.fire({
+                                title: 'Success!',
+                                text: 'Photos uploaded successfully.',
+                                icon: 'success',
+                                confirmButtonText: 'OK',
+                                timer: 3000,
+                                timerProgressBar: true,
+                            }).then(() => {
+                                this.progress = 0;
+                                this.files = [];
+                                this.previews = [];
+                                location.reload();
+                            });
+                        } else {
+                            const error = JSON.parse(xhr.responseText).message || 'Upload failed';
+                            Swal.fire({
+                                title: 'Error!',
+                                text: error,
+                                icon: 'error',
+                                confirmButtonText: 'OK',
+                            });
+                            this.progress = 0;
+                        }
+                    };
+                    xhr.onerror = () => {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'An error occurred during upload.',
+                            icon: 'error',
+                            confirmButtonText: 'OK',
+                        });
+                        this.progress = 0;
+                    };
+                    xhr.send(formData);
+                },
+            });
+        },
     };
 }
+
+    
 
     function editData() {
         return {
