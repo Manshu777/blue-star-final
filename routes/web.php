@@ -60,9 +60,12 @@ Route::delete('photos/{photo}', [UploadController::class, 'destroy'])->name('pho
 Route::post('/photos/analyze', [UploadController::class, 'analyzeImage']);
 Route::post('/search-by-face', [UploadController::class, 'searchByFace']);
 
-
+Route::post('/photos/update', [UploadController::class, 'update'])->name('photos.update');
+Route::post('/photos/enhance', [UploadController::class, 'enhance'])->name('photos.enhance');
+  Route::post('/albums/rename', [UploadController::class, 'rename'])->name('albums.rename');
+    Route::post('/albums/invite', [UploadController::class, 'invite'])->name('albums.invite');
 Route::post('/photos/search', [UploadController::class, 'search'])->name('photos.search');
-Route::put('/photos/{id}', [UploadController::class, 'update'])->name('photos.update');
+
 Route::delete('/photos/{id}', [UploadController::class, 'destroy'])->name('photos.destroy');
 Route::post('/photos/analyze', [UploadController::class, 'analyzeImage'])->name('photos.analyze');
 
