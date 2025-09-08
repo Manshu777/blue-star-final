@@ -40,45 +40,40 @@ class UploadController extends Controller
         ]);
     }
 
- public function store(Request $request)
-{
-    try {
-        // Get authenticated user and their plan
-        $user = Auth::user();
-        $plan = $user->plan;
+   public function store(Request $request)
+    {
+        try {
+            $user = Auth::user();
+            $plan = $user->plan;
 
-        // Validate plan restrictions
-        if (!$plan->is_active) {
-            Log::error('Inactive plan attempted upload', ['user_id' => $user->id, 'plan' => $plan->name]);
-            return $this->errorResponse('Your plan is inactive.', 403);
-        }
-
-        // Check daily upload limit
-        if ($plan->photo_upload_limit > 0) {
-            $todayUploads = Photo::where('user_id', $user->id)
-                ->whereDate('created_at', Carbon::today())
-                ->count();
-            $newFilesCount = count($request->file('files') ?? []);
-            if ($todayUploads + $newFilesCount > $plan->photo_upload_limit) {
-                Log::error('Daily upload limit exceeded', ['user_id' => $user->id, 'limit' => $plan->photo_upload_limit]);
-                return $this->errorResponse('Daily upload limit exceeded.', 403);
+            if (!$plan->is_active) {
+                Log::error('Inactive plan attempted upload', ['user_id' => $user->id, 'plan' => $plan->name]);
+                return $this->errorResponse('Your plan is inactive.', 403);
             }
-        }
 
-        // Check storage limit
-        if ($plan->storage_limit > 0) {
-            $usedStorage = Photo::where('user_id', $user->id)->sum('file_size');
-            $newFilesSize = 0;
-            foreach ($request->file('files') ?? [] as $file) {
-                $newFilesSize += $file->getSize() / (1024 * 1024); // Convert to MB
+            if ($plan->photo_upload_limit > 0) {
+                $todayUploads = Photo::where('user_id', $user->id)
+                    ->whereDate('created_at', Carbon::today())
+                    ->count();
+                $newFilesCount = count($request->file('files') ?? []);
+                if ($todayUploads + $newFilesCount > $plan->photo_upload_limit) {
+                    Log::error('Daily upload limit exceeded', ['user_id' => $user->id, 'limit' => $plan->photo_upload_limit]);
+                    return $this->errorResponse('Daily upload limit exceeded.', 403);
+                }
             }
-            if (($usedStorage + $newFilesSize) / 1024 > $plan->storage_limit) {
-                Log::error('Storage limit exceeded', ['user_id' => $user->id, 'used' => $usedStorage, 'limit' => $plan->storage_limit]);
-                return $this->errorResponse('Storage limit exceeded.', 403);
-            }
-        }
 
-            // Validate request
+            if ($plan->storage_limit > 0) {
+                $usedStorage = Photo::where('user_id', $user->id)->sum('file_size');
+                $newFilesSize = 0;
+                foreach ($request->file('files') ?? [] as $file) {
+                    $newFilesSize += $file->getSize() / (1024 * 1024);
+                }
+                if (($usedStorage + $newFilesSize) / 1024 > $plan->storage_limit) {
+                    Log::error('Storage limit exceeded', ['user_id' => $user->id, 'used' => $usedStorage, 'limit' => $plan->storage_limit]);
+                    return $this->errorResponse('Storage limit exceeded.', 403);
+                }
+            }
+
             $validated = $request->validate([
                 'title' => 'required|string|max:255',
                 'description' => 'nullable|string|max:1000',
@@ -88,16 +83,17 @@ class UploadController extends Controller
                 'tags' => 'nullable|string|max:500',
                 'tour_provider' => 'nullable|string|max:255',
                 'location' => 'nullable|string|max:255',
-                'folder_name' => 'nullable|string|max:255', // Maps to event
+                'folder_name' => 'nullable|string|max:255',
                 'files.*' => 'required|file|mimes:jpg,jpeg,png,mp4,mov|max:5120',
             ]);
 
             $photos = [];
             $files = $request->file('files') ?? [];
+            $processedHashes = [];
 
-        if (empty($files)) {
-            return $this->errorResponse('No files uploaded.', 422);
-        }
+            if (empty($files)) {
+                return $this->errorResponse('No files uploaded.', 422);
+            }
 
             foreach ($files as $file) {
                 if (!$file->isValid()) {
@@ -105,22 +101,31 @@ class UploadController extends Controller
                     continue;
                 }
 
-                // Generate file paths
+                // Check for duplicate file
+                $fileHash = hash_file('md5', $file->getRealPath());
+                if (in_array($fileHash, $processedHashes)) {
+                    Log::warning('Duplicate file detected', ['user_id' => $user->id, 'hash' => $fileHash]);
+                    continue;
+                }
+                $processedHashes[] = $fileHash;
+
                 $fileExtension = $file->getClientOriginalExtension();
                 $fileName = Str::random(40) . '.' . $fileExtension;
                 $directory = 'uploads';
-                $path = "uploads/$fileName";
+                $path = "Uploads/$fileName";
 
-                // Upload to S3
+                // Upload to S3 with timeout
+                $startTime = microtime(true);
+                $timeout = 30; // seconds
                 $uploadedPath = Storage::disk('s3')->putFileAs($directory, $file, $fileName);
-                if (!$uploadedPath) {
-                    Log::error('S3 upload failed', ['user_id' => $user->id, 'file' => $fileName]);
+                if (!$uploadedPath || (microtime(true) - $startTime) > $timeout) {
+                    Log::error('S3 upload failed or timed out', ['user_id' => $user->id, 'file' => $fileName]);
                     continue;
                 }
 
-                // Verify S3 object availability
-                $maxRetries = 5;
-                $retryDelay = 1; // seconds
+                // Verify S3 object availability with reduced retries
+                $maxRetries = 3;
+                $retryDelay = 1;
                 $attempt = 0;
                 while ($attempt < $maxRetries) {
                     try {
@@ -129,18 +134,16 @@ class UploadController extends Controller
                     } catch (\Exception $e) {
                         if ($attempt === $maxRetries - 1) {
                             Log::error('S3 object not available', ['user_id' => $user->id, 'path' => $uploadedPath]);
-                            continue 2; // Skip to next file
+                            continue 2;
                         }
                         sleep($retryDelay);
                         $attempt++;
                     }
                 }
 
-                // Initialize metadata and tags
                 $metadata = [];
                 $tags = $validated['tags'] ? trim($validated['tags'], ',') : '';
 
-                // Extract EXIF data
                 if (in_array($file->getMimeType(), ['image/jpeg', 'image/png']) && function_exists('exif_read_data')) {
                     $exif = @exif_read_data($file->getRealPath());
                     if ($exif) {
@@ -159,7 +162,6 @@ class UploadController extends Controller
                     $metadata['location'] = $validated['location'] ?? null;
                 }
 
-                // Facial Recognition
                 if ($plan->facial_recognition_enabled && in_array($file->getMimeType(), ['image/jpeg', 'image/png'])) {
                     if ($plan->name === 'Free') {
                         $todaySearches = Photo::where('user_id', $user->id)
@@ -168,97 +170,69 @@ class UploadController extends Controller
                             ->count();
                         if ($todaySearches >= 5) {
                             Log::error('Facial recognition limit exceeded', ['user_id' => $user->id]);
+                            $tags = $tags ? "$tags,facial_recognition_limit_exceeded" : 'facial_recognition_limit_exceeded';
                             continue;
                         }
                     }
 
                     try {
-                        // Verify uploaded file exists in S3
                         if (!Storage::disk('s3')->exists($uploadedPath)) {
                             Log::error('Uploaded file not found in S3', ['user_id' => $user->id, 'path' => $uploadedPath]);
                             $tags = $tags ? "$tags,s3_object_missing" : 's3_object_missing';
                             continue;
                         }
 
-                        // Get reference selfie path
                         $selfiePath = $user->reference_selfie_path;
-                        if ($selfiePath) {
-                            // Verify selfie exists in S3
-                            $attempt = 0;
-                            while ($attempt < $maxRetries) {
-                                try {
-                                    Storage::disk('s3')->get($selfiePath);
-                                    break;
-                                } catch (\Exception $e) {
-                                    if ($attempt === $maxRetries - 1) {
-                                        Log::error('Reference selfie not found in S3', ['user_id' => $user->id, 'selfie_path' => $selfiePath]);
-                                        $tags = $tags ? "$tags,no_reference_selfie" : 'no_reference_selfie';
-                                        continue 2; // Skip to next file
-                                    }
-                                    sleep($retryDelay);
-                                    $attempt++;
-                                }
-                            }
-                        } else {
-                            Log::warning('No reference selfie available', ['user_id' => $user->id]);
-                            $tags = $tags ? "$tags,no_reference_selfie" : 'no_reference_selfie';
-                            continue;
-                        }
-
-                        // Log Rekognition attempt
-                        Log::info('Rekognition CompareFaces attempt', [
-                            'user_id' => $user->id,
-                            'bucket' => env('AWS_BUCKET'),
-                            'source_path' => $selfiePath,
-                            'target_path' => $uploadedPath
-                        ]);
-
-                        // Detect faces
-                        $detectResult = $this->rekognition->detectFaces([
-                            'Image' => [
-                                'S3Object' => [
-                                    'Bucket' => env('AWS_BUCKET'),
-                                    'Name' => $uploadedPath,
-                                ],
-                            ],
-                            'Attributes' => ['ALL'],
-                        ]);
-
-                        $faceDetails = $detectResult->get('FaceDetails');
-                        if (empty($faceDetails)) {
-                            Log::info('No faces detected', ['user_id' => $user->id, 'photo_path' => $uploadedPath]);
-                            $tags = $tags ? "$tags,no_face" : 'no_face';
-                        } else {
-                            Log::info('Faces detected', ['user_id' => $user->id, 'photo_path' => $uploadedPath, 'count' => count($faceDetails)]);
-                            $tags = $tags ? "$tags,face_detected" : 'face_detected';
-
-                            // Compare faces
-                            $compareResult = $this->rekognition->compareFaces([
-                                'SourceImage' => [
-                                    'S3Object' => [
-                                        'Bucket' => env('AWS_BUCKET'),
-                                        'Name' => $selfiePath,
-                                    ],
-                                ],
-                                'TargetImage' => [
+                        if ($selfiePath && Storage::disk('s3')->exists($selfiePath)) {
+                            $startTime = microtime(true);
+                            $detectResult = $this->rekognition->detectFaces([
+                                'Image' => [
                                     'S3Object' => [
                                         'Bucket' => env('AWS_BUCKET'),
                                         'Name' => $uploadedPath,
                                     ],
                                 ],
-                                'SimilarityThreshold' => 70,
+                                'Attributes' => ['ALL'],
                             ]);
 
-                            $faceMatches = $compareResult->get('FaceMatches');
-                            if (!empty($faceMatches)) {
-                                $similarity = $faceMatches[0]['Similarity'];
-                                Log::info('Face match found', ['user_id' => $user->id, 'similarity' => $similarity]);
-                                $tags = $tags ? "$tags,face_matched" : 'face_matched';
-                                $metadata['face_match_similarity'] = $similarity;
+                            $faceDetails = $detectResult->get('FaceDetails');
+                            if (empty($faceDetails)) {
+                                Log::info('No faces detected', ['user_id' => $user->id, 'photo_path' => $uploadedPath]);
+                                $tags = $tags ? "$tags,no_face" : 'no_face';
                             } else {
-                                Log::info('No face match', ['user_id' => $user->id, 'photo_path' => $uploadedPath]);
-                                $tags = $tags ? "$tags,face_detected_no_match" : 'face_detected_no_match';
+                                Log::info('Faces detected', ['user_id' => $user->id, 'photo_path' => $uploadedPath, 'count' => count($faceDetails)]);
+                                $tags = $tags ? "$tags,face_detected" : 'face_detected';
+
+                                $compareResult = $this->rekognition->compareFaces([
+                                    'SourceImage' => [
+                                        'S3Object' => [
+                                            'Bucket' => env('AWS_BUCKET'),
+                                            'Name' => $selfiePath,
+                                        ],
+                                    ],
+                                    'TargetImage' => [
+                                        'S3Object' => [
+                                            'Bucket' => env('AWS_BUCKET'),
+                                            'Name' => $uploadedPath,
+                                        ],
+                                    ],
+                                    'SimilarityThreshold' => 70,
+                                ]);
+
+                                $faceMatches = $compareResult->get('FaceMatches');
+                                if (!empty($faceMatches)) {
+                                    $similarity = $faceMatches[0]['Similarity'];
+                                    Log::info('Face match found', ['user_id' => $user->id, 'similarity' => $similarity]);
+                                    $tags = $tags ? "$tags,face_matched" : 'face_matched';
+                                    $metadata['face_match_similarity'] = $similarity;
+                                } else {
+                                    Log::info('No face match', ['user_id' => $user->id, 'photo_path' => $uploadedPath]);
+                                    $tags = $tags ? "$tags,face_detected_no_match" : 'face_detected_no_match';
+                                }
                             }
+                        } else {
+                            Log::warning('No reference selfie available or not found', ['user_id' => $user->id, 'selfie_path' => $selfiePath]);
+                            $tags = $tags ? "$tags,no_reference_selfie" : 'no_reference_selfie';
                         }
                     } catch (\Aws\Exception\AwsException $e) {
                         Log::error('Rekognition error', [
@@ -270,7 +244,6 @@ class UploadController extends Controller
                     }
                 }
 
-                // Create photo record
                 $photo = Photo::create([
                     'user_id' => $user->id,
                     'title' => $validated['title'],
@@ -285,7 +258,7 @@ class UploadController extends Controller
                     'location' => $metadata['location'] ?? $validated['location'] ?? null,
                     'event' => $validated['folder_name'] ?? null,
                     'date' => $metadata['date'] ?? now(),
-                    'file_size' => $file->getSize() / (1024 * 1024), // Store in MB
+                    'file_size' => $file->getSize() / (1024 * 1024),
                 ]);
 
                 Log::info('Photo uploaded successfully', [
@@ -300,40 +273,28 @@ class UploadController extends Controller
                 ];
             }
 
-        if (empty($photos)) {
-            return $this->errorResponse('No valid files uploaded.', 422);
-        }
+            if (empty($photos)) {
+                return $this->errorResponse('No valid files uploaded.', 422);
+            }
 
-        // Return response based on request type
-        if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
                 'photos' => $photos,
+                'message' => 'Photos uploaded successfully.',
+                'urls' => array_column($photos, 'url'),
             ], 201);
-        }
-
-        return redirect()->route('photos.store')->with([
-            'success' => 'Photos uploaded successfully.',
-            'urls' => array_column($photos, 'url'),
-        ]);
-    } catch (ValidationException $e) {
-        Log::error('Validation failed', ['errors' => $e->errors(), 'user_id' => Auth::id()]);
-        if ($request->expectsJson()) {
-            return response()->json(['success' => false, 'errors' => $e->errors()], 422);
-        }
-        return redirect()->back()->withErrors($e->errors())->withInput();
-    } catch (\Exception $e) {
-        Log::error('Upload error', [
-            'user_id' => Auth::id(),
-            'message' => $e->getMessage(),
-            'trace' => $e->getTraceAsString(),
-        ]);
-        if ($request->expectsJson()) {
+        } catch (ValidationException $e) {
+            Log::error('Validation failed', ['errors' => $e->errors(), 'user_id' => Auth::id()]);
+            return response()->json(['success' => false, 'errors' => $e->errors(), 'message' => 'Validation failed.'], 422);
+        } catch (\Exception $e) {
+            Log::error('Upload error', [
+                'user_id' => Auth::id(),
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             return response()->json(['success' => false, 'message' => 'Upload failed: ' . $e->getMessage()], 500);
         }
-        return redirect()->back()->with('error', 'Upload failed: ' . $e->getMessage())->withInput();
     }
-}
 
     protected function errorResponse($message, $status)
     {
