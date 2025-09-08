@@ -76,7 +76,7 @@ Route::get('photos/{photo}', [UploadController::class, 'show'])->name('photos.sh
 // Route::post('photos/{photo}', [UploadController::class, 'update'])->name('photos.update');
 Route::delete('photos/{photo}', [UploadController::class, 'destroy'])->name('photos.destroy');
 
-Route::post('/photos/analyze', [UploadController::class, 'analyzeImage']);
+
 Route::post('/search-by-face', [UploadController::class, 'searchByFace']);
 
 Route::post('/photos/update', [UploadController::class, 'update'])->name('photos.update');
