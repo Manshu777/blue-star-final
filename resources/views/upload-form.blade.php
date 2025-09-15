@@ -358,9 +358,9 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V8m0 0l-4 4m4-4l4 4m6-4v8m0 0h-4m4 0h4" />
                 </svg>
                 <p class="text-gray-500 dark:text-gray-400">Drag & drop files here, or click to select (multiple allowed)</p>
-                <input type="file" name="files[]" id="file" class="hidden"
-                       accept="image/jpeg,image/png,video/mp4,video/quicktime" multiple
-                       @change="handleFileChange($event)" x-ref="fileInput">
+                   <input type="file" name="files[]" id="file" class="hidden"
+       accept="image/jpeg,image/png,video/mp4,video/quicktime" multiple
+       @change.debounce.500ms="handleFileChange($event)" x-ref="fileInput">
                 <div class="flex justify-center space-x-2 mt-2">
                     <button type="button"
                             class="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 py-1 px-3 rounded-full text-sm hover:bg-blue-200 dark:hover:bg-blue-800 transition"
@@ -522,13 +522,14 @@
             <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Uploading: <span x-text="progress + '%'"></span></p>
         </div>
         <!-- Submit -->
-        <button type="submit"
-                class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-200 font-medium flex items-center justify-center">
-            <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            Upload Media
-        </button>
+       <button type="submit"
+        class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-200 font-medium flex items-center justify-center"
+        :disabled="isUploading">
+    <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+    </svg>
+    Upload Media
+</button>
     </form>
 </div>
 
@@ -694,51 +695,51 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exif-js/2.3.0/exif.js"></script>
   <script>
- document.addEventListener('alpine:init', () => {
-     Alpine.data('gallery', () => ({
-            filterPhotos() {
-                const tags = this.searchTags.toLowerCase().split(',').map(tag => tag.trim()).filter(tag => tag);
-                if (!tags.length) {
-                    this.filteredPhotos = @json($photos);
-                    return;
-                }
-                const filtered = {};
-                Object.entries(@json($photos)).forEach(([event, photos]) => {
-                    const matchingPhotos = photos.filter(photo => 
-                        tags.every(searchTag => 
-                            photo.tags.some(tag => tag.toLowerCase().includes(searchTag))
-                        )
-                    );
-                    if (matchingPhotos.length) {
-                        filtered[event] = matchingPhotos;
-                    }
-                });
-                this.filteredPhotos = filtered;
-            },
-            openPreview(url, photo) {
-                this.previewPhoto = photo;
-                this.showPreview = true;
-            },
-            deletePhoto(event, id) {
-                if (confirm('Are you sure you want to delete this photo?')) {
-                    event.target.closest('form').submit();
-                }
-            },
-            renameAlbum(event, newName) {
-                // Implement rename logic (e.g., via fetch/AJAX to backend)
-                console.log(`Renaming album ${event} to ${newName}`);
-            },
-            deleteAlbum(event) {
-                if (confirm(`Are you sure you want to delete the album ${event}?`)) {
-                    console.log(`Deleting album ${event}`);
-                    // Implement delete logic
-                }
-            },
-            inviteCollaborator(event, email) {
-                console.log(`Inviting ${email} to album ${event}`);
-                // Implement invite logic
+
+  
+document.addEventListener('alpine:init', () => {
+    Alpine.data('gallery', () => ({
+        filterPhotos() {
+            const tags = this.searchTags.toLowerCase().split(',').map(tag => tag.trim()).filter(tag => tag);
+            if (!tags.length) {
+                this.filteredPhotos = @json($photos);
+                return;
             }
-        }));
+            const filtered = {};
+            Object.entries(@json($photos)).forEach(([event, photos]) => {
+                const matchingPhotos = photos.filter(photo =>
+                    tags.every(searchTag =>
+                        photo.tags.some(tag => tag.toLowerCase().includes(searchTag))
+                    )
+                );
+                if (matchingPhotos.length) {
+                    filtered[event] = matchingPhotos;
+                }
+            });
+            this.filteredPhotos = filtered;
+        },
+        openPreview(url, photo) {
+            this.previewPhoto = photo;
+            this.showPreview = true;
+        },
+        deletePhoto(event, id) {
+            if (confirm('Are you sure you want to delete this photo?')) {
+                event.target.closest('form').submit();
+            }
+        },
+        renameAlbum(event, newName) {
+            console.log(`Renaming album ${event} to ${newName}`);
+        },
+        deleteAlbum(event) {
+            if (confirm(`Are you sure you want to delete the album ${event}?`)) {
+                console.log(`Deleting album ${event}`);
+            }
+        },
+        inviteCollaborator(event, email) {
+            console.log(`Inviting ${email} to album ${event}`);
+        }
+    }));
+
     Alpine.data('uploadFormData', () => ({
         isDragging: false,
         previews: [],
@@ -748,27 +749,44 @@
         location: '',
         progress: 0,
         isLoadingTags: false,
-        processedFiles: new Set(), // Track processed files to avoid duplicates
+        processedFiles: new Set(),
+        isUploading: false, // Prevent multiple submissions
         handleFileChange(event) {
+            if (this.isUploading) return; // Prevent processing during upload
+            console.log('handleFileChange triggered with files:', event.target.files);
+            this.processFiles(event.target.files);
+        },
+        handleDrop(event) {
+            if (this.isUploading) return; // Prevent processing during upload
+            console.log('handleDrop triggered with files:', event.dataTransfer.files);
+            this.isDragging = false;
+            const files = event.dataTransfer.files;
+            const input = this.$refs.fileInput;
+            input.files = files; // Set files to input
+            this.processFiles(files);
+        },
+        processFiles(files) {
+            console.log('Processing files:', files);
             this.previews = [];
             this.suggestedTags = [];
             this.selectedTags = [];
             this.tags = '';
             this.isLoadingTags = true;
             this.processedFiles.clear();
-            const files = event.target.files;
             let pendingRequests = files.length;
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
-                const fileKey = `${file.name}-${file.size}`; // Unique identifier for deduplication
+                const fileKey = `${file.name}-${file.size}-${file.lastModified}`; // Unique identifier
                 if (this.processedFiles.has(fileKey)) {
-                    continue; // Skip duplicate files
+                    console.log(`Skipping duplicate file: ${file.name}`);
+                    pendingRequests--;
+                    continue;
                 }
                 this.processedFiles.add(fileKey);
-                if (file.size > 15360 * 1024) {
+                if (file.size > 15 * 1024 * 1024) { // 15MB limit
                     Swal.fire({
                         title: 'Error!',
-                        text: 'Image file size exceeds 15MB limit.',
+                        text: `${file.name} exceeds 15MB limit.`,
                         icon: 'error',
                     });
                     pendingRequests--;
@@ -834,15 +852,10 @@
                     if (pendingRequests === 0) this.isLoadingTags = false;
                 }
             }
-        },
-        handleDrop(event) {
-            this.isDragging = false;
-            const files = event.dataTransfer.files;
-            const input = this.$refs.fileInput;
-            input.files = files;
-            this.handleFileChange({ target: input });
+            console.log('Processed files:', this.processedFiles);
         },
         removePreview(index) {
+            console.log('Removing preview at index:', index);
             const removedTags = this.previews[index].tags;
             this.previews.splice(index, 1);
             this.suggestedTags = [...new Set(this.previews.flatMap(preview => preview.tags))];
@@ -856,8 +869,9 @@
             input.files = dt.files;
             this.processedFiles.clear();
             for (let i = 0; i < input.files.length; i++) {
-                this.processedFiles.add(`${input.files[i].name}-${input.files[i].size}`);
+                this.processedFiles.add(`${input.files[i].name}-${input.files[i].size}-${input.files[i].lastModified}`);
             }
+            console.log('Updated processed files:', this.processedFiles);
         },
         isCustomTag(tag) {
             return !this.previews.some(preview => preview.tags.includes(tag));
@@ -883,7 +897,11 @@
             alert('Camera capture not implemented yet');
         },
         showSweetAlert(event) {
-            event.preventDefault(); // Prevent default form submission
+            if (this.isUploading) {
+                console.log('Upload already in progress, ignoring submit');
+                return;
+            }
+            event.preventDefault();
             Swal.fire({
                 title: 'Uploading...',
                 text: 'Please wait while your files are being uploaded.',
@@ -897,10 +915,16 @@
             });
         },
         async handleSubmit(event) {
+            if (this.isUploading) {
+                console.log('Upload already in progress, ignoring');
+                return;
+            }
+            this.isUploading = true;
+            console.log('Starting upload with files:', this.$refs.fileInput.files);
             const form = event.target;
             const formData = new FormData(form);
             const xhr = new XMLHttpRequest();
-            xhr.timeout = 30000; // 30-second timeout
+            xhr.timeout = 30000;
             xhr.open('POST', form.action);
             xhr.setRequestHeader('X-CSRF-TOKEN', document.querySelector('meta[name="csrf-token"]').content);
             xhr.upload.onprogress = (e) => {
@@ -910,6 +934,7 @@
             };
             xhr.onload = () => {
                 this.progress = 0;
+                this.isUploading = false;
                 try {
                     const response = JSON.parse(xhr.responseText);
                     if (xhr.status === 201 && response.success) {
@@ -945,6 +970,7 @@
             };
             xhr.ontimeout = () => {
                 this.progress = 0;
+                this.isUploading = false;
                 Swal.fire({
                     title: 'Error!',
                     text: 'Upload timed out. Please try again.',
@@ -953,6 +979,7 @@
             };
             xhr.onerror = () => {
                 this.progress = 0;
+                this.isUploading = false;
                 Swal.fire({
                     title: 'Error!',
                     text: 'An error occurred during upload.',
@@ -963,239 +990,9 @@
         }
     }));
 
-    function editData() {
-        return {
-            canvas: null,
-            brightness: 0,
-            contrast: 0,
-            isCropping: false,
-            isVideo: false,
-            originalImage: null,
-            init() {
-                const imgSrc = this.$root.dataset.selectedPhoto || 'placeholder-image.jpg';
-                if (imgSrc.includes('.mp4') || imgSrc.includes('.mov')) {
-                    this.isVideo = true;
-                    return;
-                }
-                this.isVideo = false;
-                const img = new Image();
-                img.src = imgSrc;
-                img.crossOrigin = 'anonymous';
-                img.onload = () => {
-                    const canvasEl = document.getElementById('edit-canvas');
-                    canvasEl.width = Math.min(img.width, 800);
-                    canvasEl.height = (img.height / img.width) * canvasEl.width;
-                    this.canvas = new fabric.Canvas(canvasEl, { enableRetinaScaling: false });
-                    fabric.Image.fromURL(img.src, (fImg) => {
-                        fImg.scaleToWidth(canvasEl.width);
-                        this.originalImage = fImg;
-                        this.canvas.add(fImg);
-                        this.canvas.setActiveObject(fImg);
-                        this.canvas.renderAll();
-                    }, { crossOrigin: 'anonymous' });
-                };
-                img.onerror = () => {
-                    Swal.fire({
-                        title: 'Error!',
-                        text: 'Failed to load image for editing.',
-                        icon: 'error',
-                        confirmButtonText: 'OK',
-                    });
-                };
-                this.$watch('$root.dataset.selectedPhoto', (newSrc) => {
-                    if (newSrc) {
-                        this.isVideo = newSrc.includes('.mp4') || newSrc.includes('.mov');
-                        if (!this.isVideo && this.canvas) {
-                            this.canvas.clear();
-                            const newImg = new Image();
-                            newImg.src = newSrc;
-                            newImg.crossOrigin = 'anonymous';
-                            newImg.onload = () => {
-                                const canvasEl = document.getElementById('edit-canvas');
-                                canvasEl.width = Math.min(newImg.width, 800);
-                                canvasEl.height = (newImg.height / newImg.width) * canvasEl.width;
-                                fabric.Image.fromURL(newImg.src, (fImg) => {
-                                    fImg.scaleToWidth(canvasEl.width);
-                                    this.originalImage = fImg;
-                                    this.canvas.add(fImg);
-                                    this.canvas.setActiveObject(fImg);
-                                    this.applyFilters();
-                                    this.canvas.renderAll();
-                                }, { crossOrigin: 'anonymous' });
-                            };
-                        }
-                    }
-                });
-            },
-            toggleCrop() {
-                if (!this.canvas || this.isVideo) return;
-                this.isCropping = !this.isCropping;
-                const active = this.canvas.getActiveObject();
-                if (active) {
-                    active.set({
-                        lockScalingX: !this.isCropping,
-                        lockScalingY: !this.isCropping,
-                        lockRotation: this.isCropping,
-                        hasBorders: this.isCropping,
-                        hasControls: this.isCropping
-                    });
-                    this.canvas.setActiveObject(active);
-                    this.canvas.renderAll();
-                }
-            },
-            rotate(deg) {
-                if (!this.canvas || this.isVideo) return;
-                const active = this.canvas.getActiveObject();
-                if (active) {
-                    active.rotate((active.angle + deg) % 360);
-                    this.canvas.renderAll();
-                }
-            },
-            applyFilters() {
-                if (!this.canvas || !this.originalImage || this.isVideo) return;
-                const active = this.canvas.getActiveObject();
-                if (active) {
-                    active.filters = [
-                        new fabric.Image.filters.Brightness({ brightness: this.brightness / 100 }),
-                        new fabric.Image.filters.Contrast({ contrast: this.contrast / 100 })
-                    ];
-                    active.applyFilters();
-                    this.canvas.renderAll();
-                }
-            },
-            reset() {
-                if (!this.canvas || !this.originalImage || this.isVideo) return;
-                this.brightness = 0;
-                this.contrast = 0;
-                this.isCropping = false;
-                this.canvas.clear();
-                const fImg = fabric.util.object.clone(this.originalImage);
-                fImg.filters = [];
-                fImg.scaleToWidth(this.canvas.width);
-                this.canvas.add(fImg);
-                this.canvas.setActiveObject(fImg);
-                this.canvas.renderAll();
-            },
-            sharpen() {
-                if (this.isVideo) return;
-                Swal.fire({
-                    title: 'Processing...',
-                    text: 'Applying AI sharpen, please wait.',
-                    icon: 'info',
-                    showConfirmButton: false,
-                    allowOutsideClick: false,
-                });
-                this.applyAIFilter('sharpen');
-            },
-            colorCorrect() {
-                if (this.isVideo) return;
-                Swal.fire({
-                    title: 'Processing...',
-                    text: 'Applying AI color correction, please wait.',
-                    icon: 'info',
-                    showConfirmButton: false,
-                    allowOutsideClick: false,
-                });
-                this.applyAIFilter('color_correct');
-            },
-            applyAIFilter(type) {
-                if (!this.canvas || !this.originalImage) return;
-                const imageData = this.canvas.toDataURL({ format: 'jpeg', quality: 0.8 });
-                fetch('{{ route('photos.enhance') }}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ image: imageData, type: type, photo_id: this.$root.dataset.photoId }),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.url) {
-                        Swal.fire({
-                            title: 'Success!',
-                            text: `${type === 'sharpen' ? 'Sharpen' : 'Color Correction'} applied successfully.`,
-                            icon: 'success',
-                            timer: 2000,
-                        });
-                        fabric.Image.fromURL(data.url, (fImg) => {
-                            fImg.scaleToWidth(this.canvas.width);
-                            this.canvas.clear();
-                            this.originalImage = fImg;
-                            this.canvas.add(fImg);
-                            this.canvas.setActiveObject(fImg);
-                            this.applyFilters();
-                            this.canvas.renderAll();
-                        }, { crossOrigin: 'anonymous' });
-                    } else {
-                        Swal.fire({
-                            title: 'Error!',
-                            text: data.message || 'Failed to apply AI enhancement.',
-                            icon: 'error',
-                        });
-                    }
-                })
-                .catch(error => {
-                    Swal.fire({
-                        title: 'Error!',
-                        text: 'An error occurred while applying AI enhancement.',
-                        icon: 'error',
-                    });
-                    console.error('AI Enhancement error:', error);
-                });
-            },
-            saveImage() {
-                if (!this.canvas || this.isVideo) return;
-                Swal.fire({
-                    title: 'Saving...',
-                    text: 'Please wait while your image is being saved.',
-                    icon: 'info',
-                    showConfirmButton: false,
-                    allowOutsideClick: false,
-                });
-                const imageData = this.canvas.toDataURL({ format: 'jpeg', quality: 0.8 });
-                fetch('{{ route('photos.update') }}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ image: imageData, photo_id: this.$root.dataset.photoId }),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Image saved successfully.',
-                            icon: 'success',
-                            timer: 2000,
-                        }).then(() => {
-                            this.$root.dataset.selectedPhoto = data.url;
-                            location.reload();
-                        });
-                    } else {
-                        Swal.fire({
-                            title: 'Error!',
-                            text: data.message || 'Failed to save image.',
-                            icon: 'error',
-                        });
-                    }
-                })
-                .catch(error => {
-                    Swal.fire({
-                        title: 'Error!',
-                        text: 'An error occurred while saving the image.',
-                        icon: 'error',
-                    });
-                    console.error('Save error:', error);
-                });
-            }
-        };
-    }
-
    
 });
+
 </script>
 </body>
 </html>

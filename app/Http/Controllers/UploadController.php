@@ -295,6 +295,134 @@ class UploadController extends Controller
             return response()->json(['success' => false, 'message' => 'Upload failed: ' . $e->getMessage()], 500);
         }
     }
+   
+    public function findMatches(Request $request)
+{
+    try {
+        // Validate the uploaded selfie
+        $validated = $request->validate([
+            'selfie' => 'required|file|mimes:jpg,jpeg,png|max:5120',
+        ]);
+
+        $selfie = $request->file('selfie');
+        if (!$selfie->isValid()) {
+            Log::error('Invalid selfie uploaded', [
+                'error' => $selfie->getErrorMessage(),
+            ]);
+            return redirect()->back()->withErrors(['selfie' => 'Invalid selfie file.'])->withInput();
+        }
+
+        // Upload selfie to S3 in 'uploads' folder (temporary)
+        $fileName = 'selfie_' . Str::random(40) . '.' . $selfie->getClientOriginalExtension();
+        $directory = 'uploads';
+        $uploadedPath = Storage::disk('s3')->putFileAs($directory, $selfie, $fileName);
+
+        if (!$uploadedPath) {
+            Log::error('S3 selfie upload failed', ['file' => $fileName]);
+            return redirect()->back()->withErrors(['selfie' => 'Failed to upload selfie.'])->withInput();
+        }
+
+        // Verify S3 object availability
+        $maxRetries = 3;
+        $retryDelay = 1;
+        $attempt = 0;
+        while ($attempt < $maxRetries) {
+            try {
+                Storage::disk('s3')->get($uploadedPath);
+                break;
+            } catch (\Exception $e) {
+                if ($attempt === $maxRetries - 1) {
+                    Log::error('S3 selfie object not available', ['path' => $uploadedPath]);
+                    Storage::disk('s3')->delete($uploadedPath);
+                    return redirect()->back()->withErrors(['selfie' => 'Uploaded selfie not available.'])->withInput();
+                }
+                sleep($retryDelay);
+                $attempt++;
+            }
+        }
+
+        // Fetch all images from S3 'uploads' folder
+        $s3Images = Storage::disk('s3')->files('uploads');
+        $matches = [];
+
+        foreach ($s3Images as $imagePath) {
+            // Filter for image files (jpg, jpeg, png) only
+            if (!preg_match('/\.(jpg|jpeg|png)$/i', $imagePath)) {
+                continue;
+            }
+
+            // Skip the temporary selfie file to avoid self-match
+            if ($imagePath === $uploadedPath) {
+                continue;
+            }
+
+            try {
+                if (!Storage::disk('s3')->exists($imagePath)) {
+                    Log::warning('Photo not found in S3', ['path' => $imagePath]);
+                    continue;
+                }
+
+                // Compare faces using Rekognition with 90% similarity threshold
+                $compareResult = $this->rekognition->compareFaces([
+                    'SourceImage' => [
+                        'S3Object' => [
+                            'Bucket' => env('AWS_BUCKET'),
+                            'Name' => $uploadedPath,
+                        ],
+                    ],
+                    'TargetImage' => [
+                        'S3Object' => [
+                            'Bucket' => env('AWS_BUCKET'),
+                            'Name' => $imagePath,
+                        ],
+                    ],
+                    'SimilarityThreshold' => 90,
+                ]);
+
+                $faceMatches = $compareResult->get('FaceMatches');
+                if (!empty($faceMatches)) {
+                    $similarity = $faceMatches[0]['Similarity'];
+                    Log::info('Face match found (≥90% similarity)', [
+                        'path' => $imagePath,
+                        'similarity' => $similarity,
+                    ]);
+
+                    $matches[] = [
+                        'title' => basename($imagePath),
+                        'url' => Storage::disk('s3')->url($imagePath),
+                        'similarity' => $similarity,
+                    ];
+                }
+            } catch (\Aws\Exception\AwsException $e) {
+                Log::error('Rekognition error during face comparison', [
+                    'path' => $imagePath,
+                    'message' => $e->getMessage(),
+                    'code' => $e->getAwsErrorCode(),
+                ]);
+                continue;
+            }
+        }
+
+        // Clean up temporary selfie
+        Storage::disk('s3')->delete($uploadedPath);
+
+        // Store matches in session and redirect to results page
+        $request->session()->flash('face_matches', $matches);
+        return redirect()->route('photos.searchResults');
+
+    } catch (ValidationException $e) {
+        Log::error('Validation failed for face search', [
+            'errors' => $e->errors(),
+        ]);
+        return redirect()->back()->withErrors($e->errors())->withInput();
+    } catch (\Exception $e) {
+        Log::error('Face search error', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+        return redirect()->back()->withErrors(['selfie' => 'Face search failed: ' . $e->getMessage()])->withInput();
+    }
+}
 
     protected function errorResponse($message, $status)
     {

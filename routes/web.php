@@ -77,7 +77,7 @@ Route::get('photos/{photo}', [UploadController::class, 'show'])->name('photos.sh
 Route::delete('photos/{photo}', [UploadController::class, 'destroy'])->name('photos.destroy');
 
 
-Route::post('/search-by-face', [UploadController::class, 'searchByFace']);
+Route::post('/search-by-face', [UploadController::class, 'findMatches'])->name('photos.findMatches');
 
 Route::post('/photos/update', [UploadController::class, 'update'])->name('photos.update');
 Route::post('/photos/enhance', [UploadController::class, 'enhance'])->name('photos.enhance');
@@ -86,10 +86,12 @@ Route::post('/photos/enhance', [UploadController::class, 'enhance'])->name('phot
 Route::post('/photos/search', [UploadController::class, 'search'])->name('photos.search');
 
 Route::delete('/photos/{id}', [UploadController::class, 'destroy'])->name('photos.destroy');
-Route::post('/photos/analyze', [UploadController::class, 'analyzeImage'])->name('photos.analyze');
-
+Route::post('/photos/analyze', [UploadController::class, 'analyzeImage'])->name('photos.analyze');//
 Route::get('/dashboard', [ProfileController::class, 'index'])->name('user.dashboard');
-
+Route::get('/search-results', function () {
+    return view('results');
+})->name('photos.searchResults');
+// findMatches
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
