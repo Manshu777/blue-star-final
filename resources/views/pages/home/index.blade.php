@@ -19,39 +19,43 @@
                 </p>
 
                 <!-- Upload + Search Box -->
-<div class="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl p-6 flex flex-col md:flex-row gap-4">
-    <!-- Upload -->
+
+                <div class="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl p-6 flex flex-col gap-4">
+    <!-- Combined Upload and Search Form -->
     <div class="flex-1">
-        <form method="POST" action="{{ route('photos.findMatches') }}" enctype="multipart/form-data" class="flex items-center bg-gray-50 rounded-xl px-5 py-4">
+        <form id="uploadForm" method="POST" action="{{ route('photos.findMatches') }}" enctype="multipart/form-data" class="flex flex-col items-center bg-gray-50 rounded-xl px-5 py-4">
             @csrf
-            <svg class="h-6 w-6 text-blue-500 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-            </svg>
-            <label class="cursor-pointer">
-                <span class="text-gray-700 font-medium">Upload Selfie to Find Your Memories</span>
-                <input type="file" name="selfie" accept="image/jpeg,image/png" class="hidden" required />
-            </label>
-            <button type="submit" class="ml-3 bg-blue-500 text-white font-medium rounded-lg px-4 py-2 hover:bg-blue-600 transition">Upload</button>
+            <div class="flex items-center w-full">
+                <svg class="h-6 w-6 text-blue-500 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                <label class="cursor-pointer flex-1">
+                    <span class="text-gray-700 font-medium">Upload Selfie to Find Your Memories</span>
+                    <input type="file" id="selfieInput" name="selfie" accept="image/jpeg,image/png" class="hidden" required />
+                </label>
+            </div>
+            <!-- Image Preview -->
+            <div id="previewContainer" class="hidden mt-4 w-32 h-32 bg-gray-100 rounded-lg overflow-hidden relative">
+                <img id="previewImage" src="#" alt="Preview" class="w-full h-full object-cover" />
+            </div>
+            <!-- Crop and Submit Buttons -->
+            <div class="flex gap-3 mt-4">
+                <!-- <button type="button" id="cropButton" class="hidden bg-yellow-500 text-white font-medium rounded-lg px-4 py-2 hover:bg-yellow-600 transition">Crop</button> -->
+                <button type="submit" id="submitButton" class="bg-blue-500 text-white font-medium rounded-lg px-4 py-2 hover:bg-blue-600 transition flex items-center">
+                    <span id="submitText">Search</span>
+                    <svg id="loadingSpinner" class="hidden animate-spin h-5 w-5 text-white ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
+            </div>
             @error('selfie')
                 <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
             @enderror
         </form>
     </div>
-
-    <!-- Search -->
-    <div class="flex-1">
-        <form method="GET" class="flex items-center bg-gray-50 rounded-xl px-4 py-3 shadow-inner">
-            <svg class="h-6 w-6 text-blue-500 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input type="text" name="query" placeholder="Search by Date / Location" class="w-full bg-transparent text-gray-700 placeholder-gray-500 focus:outline-none" value="{{ old('query') }}" />
-            <button type="submit" class="ml-3 bg-blue-500 text-white font-medium rounded-lg px-4 py-2 hover:bg-blue-600 transition">Search</button>
-            @error('query')
-                <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
-            @enderror
-        </form>
-    </div>
 </div>
+
             </div>
 
             <!-- Decorative Background Glow -->

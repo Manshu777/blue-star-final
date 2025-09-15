@@ -77,37 +77,7 @@
                         <a href="{{ route('signup') }}" class="text-indigo-600 hover:underline font-medium">SignUp</a>
                     </p>
 
-                    <!-- Divider -->
-                    <!-- <div class="flex items-center gap-3 my-6">
-                            <div class="flex-grow h-px bg-gray-200"></div>
-                            <span class="text-gray-400 text-sm">or</span>
-                            <div class="flex-grow h-px bg-gray-200"></div>
-                        </div> -->
-
-                    <!-- Social Login -->
-                    <!-- <div class="space-y-3">
-                            <a href="#"
-                                class="w-full flex items-center justify-center gap-2 py-2.5 border rounded-full bg-white shadow-sm hover:bg-gray-50 transition">
-                                <img src="https://www.svgrepo.com/show/355037/google.svg" class="w-5 h-5" alt="Google">
-                                <span class="text-sm font-medium text-gray-700">Continue with Google</span>
-                            </a>
-
-                            <a href="#"
-                                class="w-full flex items-center justify-center gap-2 py-2.5 border border-blue-600 rounded-full bg-blue-600 text-white shadow-sm hover:bg-blue-700 transition">
-                                <img src="https://www.svgrepo.com/show/349574/facebook.svg" class="w-5 h-5 invert"
-                                    alt="Facebook">
-                                <span class="text-sm font-medium">Continue with Facebook</span>
-                            </a>
-
-                            <a href="#"
-                                class="w-full flex items_Google justify-center gap-2 py-2.5 border rounded-full bg-gray-900 text-white shadow-sm hover:bg-gray-800 transition">
-                                <img src="https://www.svgrepo.com/show/512317/github-142.svg" class="w-5 h-5 invert"
-                                    alt="GitHub">
-                                <span class="text-sm font-medium">Continue with GitHub</span>
-                            </a>
-                        </div> -->
-
-                    <!-- Forgot Password -->
+                  
                     <p class="mt-6 text-center text-sm">
                         <a href="{{ route('password.request') }}" class="text-gray-500 hover:underline">
                             Forgot your password?
