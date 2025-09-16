@@ -28,7 +28,6 @@ class CheckoutController extends Controller
             'billing_name' => 'required',
             'billing_email' => 'required|email',
             'billing_address' => 'required',
-            // Add more fields
         ]);
 
         $user = Auth::user();
@@ -83,7 +82,7 @@ class CheckoutController extends Controller
 
     private function getCart()
     {
-        // Same as in CartController
+        
         $user = Auth::user();
         if ($user) {
             return Cart::where('user_id', $user->id)->firstOrFail();
