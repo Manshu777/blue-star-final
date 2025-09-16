@@ -23,6 +23,20 @@ class CartController extends Controller
         return view('cart.cart', compact('cartItems', 'subtotal', 'tax', 'total'));
     }
 
+    public function applyCoupon(Request $request)
+    {
+        $couponCode = $request->input('coupon');
+
+        // simple demo logic
+        if ($couponCode === 'DISCOUNT10') {
+            return redirect()->route('cart.index')->with('success', 'Coupon applied! 10% discount.');
+        }
+
+        return redirect()->route('cart.index')->with('success', 'Invalid coupon code.');
+    }
+
+    
+
     public function add(Request $request, $productId)
     {
         $product = Product::findOrFail($productId);

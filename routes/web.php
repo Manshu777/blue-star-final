@@ -39,17 +39,23 @@ Route::get('/shop', [ProductController::class, 'index'])->name('shop.index');
 // Product details
 Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
 
+// routes/web.php
 Route::middleware('auth')->group(function () {
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add/{productId}', [CartController::class, 'add'])->name('cart.add');
     Route::patch('/cart/update/{itemId}', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/remove/{itemId}', [CartController::class, 'remove'])->name('cart.remove');
+    
+
+    // 👇 Add this route
+    Route::post('/cart/apply-coupon', [CartController::class, 'applyCoupon'])->name('cart.applyCoupon');
 
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 
     Route::get('/orders/{orderId}/complete', [OrderController::class, 'complete'])->name('orders.complete');
 });
+
 
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -85,8 +91,8 @@ Route::post('/search-by-face', [UploadController::class, 'findMatches'])->name('
 
 Route::post('/photos/update', [UploadController::class, 'update'])->name('photos.update');
 Route::post('/photos/enhance', [UploadController::class, 'enhance'])->name('photos.enhance');
-  Route::post('/albums/rename', [UploadController::class, 'rename'])->name('albums.rename');
-    Route::post('/albums/invite', [UploadController::class, 'invite'])->name('albums.invite');
+Route::post('/albums/rename', [UploadController::class, 'rename'])->name('albums.rename');
+Route::post('/albums/invite', [UploadController::class, 'invite'])->name('albums.invite');
 Route::post('/photos/search', [UploadController::class, 'search'])->name('photos.search');
 
 Route::delete('/photos/{id}', [UploadController::class, 'destroy'])->name('photos.destroy');

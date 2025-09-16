@@ -28,50 +28,53 @@
         }
     </style>
 
-<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
 </head>
 
 <body class="antialiased">
     @include('components.navbar')
     @yield('content')
-    @include('components.footer')
+    <footer class="bg-gray-900 text-white mt-auto">
+
+        @include('components.footer')
+    </footer>
     <script>
-    const selfieInput = document.getElementById('selfieInput');
-    const previewContainer = document.getElementById('previewContainer');
-    const previewImage = document.getElementById('previewImage');
-    const cropButton = document.getElementById('cropButton');
-    const submitButton = document.getElementById('submitButton');
-    const submitText = document.getElementById('submitText');
-    const loadingSpinner = document.getElementById('loadingSpinner');
+        const selfieInput = document.getElementById('selfieInput');
+        const previewContainer = document.getElementById('previewContainer');
+        const previewImage = document.getElementById('previewImage');
+        const cropButton = document.getElementById('cropButton');
+        const submitButton = document.getElementById('submitButton');
+        const submitText = document.getElementById('submitText');
+        const loadingSpinner = document.getElementById('loadingSpinner');
 
-    // Image Preview
-    selfieInput.addEventListener('change', (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                previewImage.src = e.target.result;
-                previewContainer.classList.remove('hidden');
-                cropButton.classList.remove('hidden');
-            };
-            reader.readAsDataURL(file);
-        }
-    });
+        // Image Preview
+        selfieInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    previewImage.src = e.target.result;
+                    previewContainer.classList.remove('hidden');
+                    cropButton.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
 
-    // Basic Crop Functionality (Placeholder)
-    cropButton.addEventListener('click', () => {
-        // Implement cropping logic here (e.g., using a library like Cropper.js)
-        alert('Crop functionality placeholder. Integrate a cropping library like Cropper.js for full functionality.');
-    });
+        // Basic Crop Functionality (Placeholder)
+        cropButton.addEventListener('click', () => {
+            // Implement cropping logic here (e.g., using a library like Cropper.js)
+            alert('Crop functionality placeholder. Integrate a cropping library like Cropper.js for full functionality.');
+        });
 
-    // Loading Animation
-    document.getElementById('uploadForm').addEventListener('submit', () => {
-        submitText.textContent = 'Searching...';
-        loadingSpinner.classList.remove('hidden');
-        submitButton.disabled = true;
-    });
-</script>
+        // Loading Animation
+        document.getElementById('uploadForm').addEventListener('submit', () => {
+            submitText.textContent = 'Searching...';
+            loadingSpinner.classList.remove('hidden');
+            submitButton.disabled = true;
+        });
+    </script>
     @stack('scripts')
 </body>
 
