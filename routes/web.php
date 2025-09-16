@@ -12,6 +12,9 @@ use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\S3FileUploadController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ShopController;
+
+
 
 
 
@@ -29,10 +32,11 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-use App\Http\Controllers\ShopController;
 
-
+Route::get('/product', [ProductController::class, 'index'])->name('home');
 Route::get('/shop', [ProductController::class, 'index'])->name('shop.index');
+
+// Product details
 Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
 
 Route::middleware('auth')->group(function () {

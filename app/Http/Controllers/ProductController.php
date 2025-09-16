@@ -12,20 +12,24 @@ class ProductController extends Controller
     {
         $query = Product::query();
 
-        if ($type = $request->get('type')) {
+        // Filters
+        if ($type = $request->query('type')) {
             $query->where('type', $type);
         }
 
-        if ($search = $request->get('search')) {
-            $query->where('name', 'like', "%{$search}%")
-                ->orWhere('description', 'like', "%{$search}%");
+        if ($search = $request->query('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
         }
 
-        if ($category = $request->get('category')) {
+        if ($category = $request->query('category')) {
             $query->where('category_id', $category);
         }
 
-        if ($sort = $request->get('sort')) {
+        // Sorting
+        if ($sort = $request->query('sort')) {
             switch ($sort) {
                 case 'price_asc':
                     $query->orderBy('price', 'asc');
@@ -39,25 +43,30 @@ class ProductController extends Controller
                 default:
                     $query->orderBy('name', 'asc');
             }
+        } else {
+            $query->orderBy('name', 'asc');
         }
 
-        $products = $query->paginate(12);
+        // Pagination (keep query strings so filters persist)
+        $products = $query->paginate(12)->withQueryString();
 
+        // Categories and featured for filters / sidebar
         $categories = ProductCategory::all();
-
-        // Example for featured
         $featuredProducts = Product::inRandomOrder()->limit(3)->get();
 
-        return view('shop.shop', compact('products', 'categories', 'featuredProducts'));
+        // Return the view that expects $products (resources/views/shop/index.blade.php)
+        return view('shop.index', compact('products', 'categories', 'featuredProducts'));
     }
 
     public function show($slug)
     {
         $product = Product::where('slug', $slug)->firstOrFail();
+
         $relatedProducts = Product::where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
             ->limit(4)
             ->get();
+
         $suggestedProducts = Product::where('type', $product->type)
             ->where('id', '!=', $product->id)
             ->inRandomOrder()

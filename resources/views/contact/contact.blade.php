@@ -6,44 +6,44 @@
     <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
 
         <!-- <section class="py-20 lg:py-32">
-            <div class="container mx-auto px-4">
-                <div class="text-center max-w-4xl mx-auto">
-                    <span
-                        class="mb-6 inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0 px-4 py-2 rounded-full text-sm font-medium">
-                        <i class="fas fa-heart mr-2"></i> 
-                        Get in Touch
-                    </span>
-                    <h1 class="text-5xl lg:text-6xl font-bold text-gray-900 mb-6 tracking-tight">
-                        We're Here to
-                        <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Help</span>
-                    </h1>
-                    <p class="text-xl text-gray-600 mb-12 leading-relaxed max-w-2xl mx-auto">
-                        Have questions about Blue Star Memory? Need technical support? Want to explore enterprise solutions?
-                        Our team is ready to assist you.
-                    </p>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div
-                            class="text-center p-6 bg-white/80 backdrop-blur-md rounded-2xl border border-white/30 shadow-md hover:shadow-lg transition-shadow duration-300">
-                            <i class="fas fa-clock w-8 h-8 text-blue-600 mx-auto mb-3 block"></i>
-                            <div class="font-semibold text-gray-900">Response Time</div>
-                            <div class="text-sm text-gray-600">Within 24 hours</div>
-                        </div>
-                        <div
-                            class="text-center p-6 bg-white/80 backdrop-blur-md rounded-2xl border border-white/30 shadow-md hover:shadow-lg transition-shadow duration-300">
-                            <i class="fas fa-users w-8 h-8 text-purple-600 mx-auto mb-3 block"></i>
-                            <div class="font-semibold text-gray-900">Expert Team</div>
-                            <div class="text-sm text-gray-600">AI & Tech Specialists</div>
-                        </div>
-                        <div
-                            class="text-center p-6 bg-white/80 backdrop-blur-md rounded-2xl border border-white/30 shadow-md hover:shadow-lg transition-shadow duration-300">
-                            <i class="fas fa-globe w-8 h-8 text-green-600 mx-auto mb-3 block"></i>
-                            <div class="font-semibold text-gray-900">Global Support</div>
-                            <div class="text-sm text-gray-600">Multiple time zones</div>
+                <div class="container mx-auto px-4">
+                    <div class="text-center max-w-4xl mx-auto">
+                        <span
+                            class="mb-6 inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0 px-4 py-2 rounded-full text-sm font-medium">
+                            <i class="fas fa-heart mr-2"></i> 
+                            Get in Touch
+                        </span>
+                        <h1 class="text-5xl lg:text-6xl font-bold text-gray-900 mb-6 tracking-tight">
+                            We're Here to
+                            <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Help</span>
+                        </h1>
+                        <p class="text-xl text-gray-600 mb-12 leading-relaxed max-w-2xl mx-auto">
+                            Have questions about Blue Star Memory? Need technical support? Want to explore enterprise solutions?
+                            Our team is ready to assist you.
+                        </p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div
+                                class="text-center p-6 bg-white/80 backdrop-blur-md rounded-2xl border border-white/30 shadow-md hover:shadow-lg transition-shadow duration-300">
+                                <i class="fas fa-clock w-8 h-8 text-blue-600 mx-auto mb-3 block"></i>
+                                <div class="font-semibold text-gray-900">Response Time</div>
+                                <div class="text-sm text-gray-600">Within 24 hours</div>
+                            </div>
+                            <div
+                                class="text-center p-6 bg-white/80 backdrop-blur-md rounded-2xl border border-white/30 shadow-md hover:shadow-lg transition-shadow duration-300">
+                                <i class="fas fa-users w-8 h-8 text-purple-600 mx-auto mb-3 block"></i>
+                                <div class="font-semibold text-gray-900">Expert Team</div>
+                                <div class="text-sm text-gray-600">AI & Tech Specialists</div>
+                            </div>
+                            <div
+                                class="text-center p-6 bg-white/80 backdrop-blur-md rounded-2xl border border-white/30 shadow-md hover:shadow-lg transition-shadow duration-300">
+                                <i class="fas fa-globe w-8 h-8 text-green-600 mx-auto mb-3 block"></i>
+                                <div class="font-semibold text-gray-900">Global Support</div>
+                                <div class="text-sm text-gray-600">Multiple time zones</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section> -->
+            </section> -->
 
         <!-- Contact Methods - Improved with subtle animations and cleaner cards -->
         <section class="py-20 bg-white">
@@ -294,109 +294,109 @@
             </div>
         </section>
 
-       
+
         <!-- <section class="py-20 bg-white">
-            <div class="container mx-auto px-4">
-                <div class="text-center mb-16">
-                    <span
-                        class="mb-6 inline-block bg-orange-100 text-orange-800 px-4 py-2 rounded-full text-sm font-medium">
-                        <i class="fas fa-star mr-2"></i>
-                        Investment Information
-                    </span>
-                    <h2 class="text-4xl font-bold text-gray-900 mb-4 tracking-tight">
-                        Development Investment Details
-                    </h2>
-                    <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                        Transparent pricing for our comprehensive development and deployment services
-                    </p>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
-                    <div>
-                        <h3 class="text-2xl font-bold text-gray-900 mb-6">Development Costs</h3>
-                        <div class="space-y-4 mb-8">
-                            <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
-                                <div class="flex items-center space-x-3">
-                                    <i class="fas fa-mobile-alt w-6 h-6 text-blue-600"></i>
-                                    <span class="font-medium text-gray-900">Mobile App Development</span>
-                                </div>
-                                <span class="text-xl font-bold text-gray-900">₹75,000</span>
-                            </div>
-                            <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
-                                <div class="flex items-center space-x-3">
-                                    <i class="fas fa-globe w-6 h-6 text-purple-600"></i>
-                                    <span class="font-medium text-gray-900">Website Development</span>
-                                </div>
-                                <span class="text-xl font-bold text-gray-900">₹45,000</span>
-                            </div>
-                            <div
-                                class="flex justify-between items-center p-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg text-white">
-                                <div class="flex items-center space-x-3">
-                                    <i class="fas fa-star w-6 h-6"></i>
-                                    <span class="font-medium">Total Investment</span>
-                                </div>
-                                <span class="text-2xl font-bold">₹1,20,000</span>
-                            </div>
-                        </div>
-
-                        <h4 class="text-lg font-bold text-gray-900 mb-4">Operational Costs</h4>
-                        <div class="p-4 bg-blue-50 rounded-lg mb-6">
-                            <div class="flex justify-between items-center">
-                                <span class="font-medium text-gray-900">Monthly Server & Hosting</span>
-                                <span class="font-bold text-blue-600">₹2,500 - ₹3,000</span>
-                            </div>
-                        </div>
-
-                        <button
-                            class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 rounded-md transition-colors duration-300">
-                            <i class="fas fa-arrow-right mr-2"></i>
-                            Start Your Project
-                        </button>
+                <div class="container mx-auto px-4">
+                    <div class="text-center mb-16">
+                        <span
+                            class="mb-6 inline-block bg-orange-100 text-orange-800 px-4 py-2 rounded-full text-sm font-medium">
+                            <i class="fas fa-star mr-2"></i>
+                            Investment Information
+                        </span>
+                        <h2 class="text-4xl font-bold text-gray-900 mb-4 tracking-tight">
+                            Development Investment Details
+                        </h2>
+                        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                            Transparent pricing for our comprehensive development and deployment services
+                        </p>
                     </div>
 
-                    <div class="bg-gradient-to-br from-gray-50 to-blue-50 p-8 rounded-2xl shadow-md">
-                        <h3 class="text-2xl font-bold text-gray-900 mb-6">What's Included</h3>
-                        <div class="space-y-4">
-                            <div class="flex items-start space-x-3">
-                                <i class="fas fa-check-circle w-6 h-6 text-green-500 flex-shrink-0 mt-0.5"></i>
-                                <div>
-                                    <h4 class="font-semibold text-gray-900">Complete AI Platform</h4>
-                                    <p class="text-gray-600">Full facial recognition and photo organization system</p>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-6">Development Costs</h3>
+                            <div class="space-y-4 mb-8">
+                                <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fas fa-mobile-alt w-6 h-6 text-blue-600"></i>
+                                        <span class="font-medium text-gray-900">Mobile App Development</span>
+                                    </div>
+                                    <span class="text-xl font-bold text-gray-900">₹75,000</span>
+                                </div>
+                                <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fas fa-globe w-6 h-6 text-purple-600"></i>
+                                        <span class="font-medium text-gray-900">Website Development</span>
+                                    </div>
+                                    <span class="text-xl font-bold text-gray-900">₹45,000</span>
+                                </div>
+                                <div
+                                    class="flex justify-between items-center p-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg text-white">
+                                    <div class="flex items-center space-x-3">
+                                        <i class="fas fa-star w-6 h-6"></i>
+                                        <span class="font-medium">Total Investment</span>
+                                    </div>
+                                    <span class="text-2xl font-bold">₹1,20,000</span>
                                 </div>
                             </div>
-                            <div class="flex items-start space-x-3">
-                                <i class="fas fa-check-circle w-6 h-6 text-green-500 flex-shrink-0 mt-0.5"></i>
-                                <div>
-                                    <h4 class="font-semibold text-gray-900">Mobile Applications</h4>
-                                    <p class="text-gray-600">Native iOS and Android apps with full functionality</p>
+
+                            <h4 class="text-lg font-bold text-gray-900 mb-4">Operational Costs</h4>
+                            <div class="p-4 bg-blue-50 rounded-lg mb-6">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-medium text-gray-900">Monthly Server & Hosting</span>
+                                    <span class="font-bold text-blue-600">₹2,500 - ₹3,000</span>
                                 </div>
                             </div>
-                            <div class="flex items-start space-x-3">
-                                <i class="fas fa-check-circle w-6 h-6 text-green-500 flex-shrink-0 mt-0.5"></i>
-                                <div>
-                                    <h4 class="font-semibold text-gray-900">Admin Dashboard</h4>
-                                    <p class="text-gray-600">Comprehensive management and analytics tools</p>
+
+                            <button
+                                class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 rounded-md transition-colors duration-300">
+                                <i class="fas fa-arrow-right mr-2"></i>
+                                Start Your Project
+                            </button>
+                        </div>
+
+                        <div class="bg-gradient-to-br from-gray-50 to-blue-50 p-8 rounded-2xl shadow-md">
+                            <h3 class="text-2xl font-bold text-gray-900 mb-6">What's Included</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-start space-x-3">
+                                    <i class="fas fa-check-circle w-6 h-6 text-green-500 flex-shrink-0 mt-0.5"></i>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900">Complete AI Platform</h4>
+                                        <p class="text-gray-600">Full facial recognition and photo organization system</p>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="flex items-start space-x-3">
-                                <i class="fas fa-check-circle w-6 h-6 text-green-500 flex-shrink-0 mt-0.5"></i>
-                                <div>
-                                    <h4 class="font-semibold text-gray-900">Cloud Infrastructure</h4>
-                                    <p class="text-gray-600">Scalable cloud setup with security measures</p>
+                                <div class="flex items-start space-x-3">
+                                    <i class="fas fa-check-circle w-6 h-6 text-green-500 flex-shrink-0 mt-0.5"></i>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900">Mobile Applications</h4>
+                                        <p class="text-gray-600">Native iOS and Android apps with full functionality</p>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="flex items-start space-x-3">
-                                <i class="fas fa-check-circle w-6 h-6 text-green-500 flex-shrink-0 mt-0.5"></i>
-                                <div>
-                                    <h4 class="font-semibold text-gray-900">Training & Support</h4>
-                                    <p class="text-gray-600">Complete training and 6 months of support</p>
+                                <div class="flex items-start space-x-3">
+                                    <i class="fas fa-check-circle w-6 h-6 text-green-500 flex-shrink-0 mt-0.5"></i>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900">Admin Dashboard</h4>
+                                        <p class="text-gray-600">Comprehensive management and analytics tools</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-3">
+                                    <i class="fas fa-check-circle w-6 h-6 text-green-500 flex-shrink-0 mt-0.5"></i>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900">Cloud Infrastructure</h4>
+                                        <p class="text-gray-600">Scalable cloud setup with security measures</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-3">
+                                    <i class="fas fa-check-circle w-6 h-6 text-green-500 flex-shrink-0 mt-0.5"></i>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900">Training & Support</h4>
+                                        <p class="text-gray-600">Complete training and 6 months of support</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section> -->
+            </section> -->
 
         <section class="py-20 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
             <div class="container mx-auto px-4 text-center">
