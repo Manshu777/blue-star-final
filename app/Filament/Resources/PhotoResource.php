@@ -6,6 +6,9 @@ use App\Filament\Resources\PhotoResource\Pages;
 use App\Filament\Resources\PhotoResource\RelationManagers;
 use App\Models\Photo;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -21,7 +24,7 @@ class PhotoResource extends Resource
 
     public static function form(Form $form): Form
     {
-       return $form
+        return $form
             ->schema([
                 Forms\Components\Select::make('user_id')
                     ->relationship('user', 'name')
@@ -46,9 +49,7 @@ class PhotoResource extends Resource
                     ->preserveFilenames()
                     ->image()
                     ->maxSize(10240),
-                Forms\Components\TextInput::make('price')
-                    ->numeric()
-                    ->prefix('$'),
+
                 Forms\Components\Toggle::make('is_featured')
                     ->required(),
                 Forms\Components\Select::make('license_type')
@@ -68,10 +69,30 @@ class PhotoResource extends Resource
                     ->numeric()
                     ->suffix('MB')
                     ->default(0),
+                Select::make('photographer_id')
+                    ->relationship('photographer', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->required(fn(string $operation): bool => $operation === 'create'),
+
+                TextInput::make('price')
+                    ->numeric()
+                    ->prefix('$')
+                    ->required()
+                    ->step(0.01),
+
+                Toggle::make('is_sold')
+                    ->label('Sold?'),
+
+                TextInput::make('original_path')
+                    ->disabled()
+                    ->dehydrated(false),
+
+
             ]);
     }
 
- public static function table(Table $table): Table
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -101,7 +122,7 @@ class PhotoResource extends Resource
                     ->relationship('user', 'name')
                     ->label('User'),
                 Tables\Filters\SelectFilter::make('location')
-                    ->options(fn () => Photo::distinct('location')->pluck('location', 'location')),
+                    ->options(fn() => Photo::distinct('location')->pluck('location', 'location')),
                 Tables\Filters\TernaryFilter::make('is_featured'),
             ])
             ->actions([

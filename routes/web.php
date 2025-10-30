@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\Api\PhotoController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PhotographerController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
@@ -123,6 +125,20 @@ Route::get('/photos/share/preview/{id}', [SocialShareController::class, 'preview
 Route::get('/upload', [S3FileUploadController::class, 'showForm'])->name('upload.form');
 Route::post('/upload', [S3FileUploadController::class, 'upload'])->name('upload');
 Route::get('/photos', [S3FileUploadController::class, 'index'])->name('photos.index');
+
+
+// New: Photographer routes
+Route::middleware(['auth', 'photographer'])->prefix('photographer')->name('photographer.')->group(function () {
+    Route::get('/dashboard', [PhotographerController::class, 'index'])->name('dashboard');
+    Route::get('/upload', function () { return view('photographer.upload'); })->name('upload'); // Simple GET for form
+    Route::post('/upload', [PhotographerController::class, 'upload']);
+});
+
+// Update: Photo purchase/download (extend existing PhotoController routes)
+Route::middleware('auth')->group(function () {
+    Route::post('/photos/{photo}/purchase', [PhotoController::class, 'purchase'])->name('photos.purchase');
+    Route::get('/photos/{photo}/download', [PhotoController::class, 'download'])->name('photos.download');
+});
 
 //search
 require __DIR__ . '/auth.php';

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Photo;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use Notification;
 
 class PhotoController extends Controller
 {
@@ -98,6 +99,67 @@ class PhotoController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => 'An error occurred during upload: ' . $e->getMessage()], 500);
         }
+    }
+
+
+    public function purchase(Photo $photo)
+    {
+        if ($photo->is_sold) {
+            return back()->with('error', 'Already sold!');
+        }
+
+        $user = Auth::user();
+        if (!$user) {
+            return redirect()->route('login');
+        }
+
+        // Create or get active order (simple; extend for cart if needed)
+        $order = Order::firstOrCreate(
+            ['user_id' => $user->id, 'status' => 'pending'],
+            ['total' => $photo->price] // Stub; add payment later
+        );
+
+        // Add to order items
+        OrderItem::create([
+            'order_id' => $order->id,
+            'photo_id' => $photo->id, // Assuming OrderItem has photo_id; add migration if missing
+            'quantity' => 1,
+            'price' => $photo->price,
+        ]);
+
+        // Mark sold & notify photographer
+        $photo->update(['is_sold' => true]);
+        $photographer = $photo->photographer;
+        if ($photographer) {
+            Notification::send($photographer, new \App\Notifications\PurchaseNotification($photo, $user));
+        }
+
+        // Update order total (simple sum)
+        $order->update(['total' => $order->orderItems->sum('price')]);
+
+        return redirect()->route('photos.search')->with('success', 'Purchased! Download available.');
+    }
+
+    /**
+     * Download original (if owned/sold).
+     */
+    public function download(Photo $photo)
+    {
+        $user = Auth::user();
+        if (!$user || !$photo->is_sold) {
+            abort(403, 'Not authorized.');
+        }
+
+        // Check ownership: User has order item for this photo
+        $owned = $user->orders()->whereHas('orderItems', function ($q) use ($photo) {
+            $q->where('photo_id', $photo->id);
+        })->exists();
+
+        if (!$owned) {
+            abort(403);
+        }
+
+        return Storage::download($photo->original_path, $photo->title . '.jpg');
     }
 
     /**

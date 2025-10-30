@@ -27,7 +27,7 @@ class User extends Authenticatable
         'reference_selfie_path',
         'otp',
         'temp_selfie_path',
-
+        'role',
         'status',
 
     ];

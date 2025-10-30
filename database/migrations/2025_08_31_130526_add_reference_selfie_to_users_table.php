@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
        Schema::table('users', function (Blueprint $table) {
-    $table->string('reference_selfie_path')->nullable()->after('plan_id');
+    $table->string('reference_selfie_path')->nullable();
 });
     }
 
